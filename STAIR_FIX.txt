@@ -1,0 +1,17 @@
+// Replace lines 125-134 with this:
+
+                                            // TRUE STAIR STRUCTURE
+                                            // Treads (horizontal): 70deg X-rotation
+                                            // Risers (vertical): 5deg X-rotation
+                                            transform: isTread
+                                                ? 'rotateX(70deg) rotateZ(-25deg) transformStyle(preserve-3d)'
+                                                : 'rotateX(5deg) rotateZ(-25deg) transformStyle(preserve-3d)',
+                                            
+                                            // Diagonal stair descent (each step shifts right)
+                                            marginLeft: `${stepIndex * 50}px`,
+                                            
+                                            // Physical connection (risers up to meet treads)
+                                            marginTop: isTread ? '0' : '-35px',
+                                            
+                                            zIndex: 10 - i,
+                                            position: 'relative',
