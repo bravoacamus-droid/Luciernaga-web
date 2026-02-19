@@ -146,7 +146,7 @@ export default function IntroLoader() {
             y: 40,
             opacity: 0,
             transformOrigin: "50% 50% -20px",
-            transition: { duration: 1.0, ease: "easeInOut" }
+            transition: { duration: 1.0, ease: "easeInOut" as Easing }
         }
     };
 
