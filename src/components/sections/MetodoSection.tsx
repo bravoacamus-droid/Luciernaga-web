@@ -78,12 +78,12 @@ function MethodPhase({ step, i }: { step: any, i: number }) {
 
     return (
         <div
-            className={`relative flex-1 min-h-[260px] lg:min-h-0 group transition-[flex-grow] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:grow-[6] border-r border-white/10 lg:-skew-x-6 bg-[#030712] ${isFirst ? "lg:-ml-8 lg:pl-8" : ""} ${isLast ? "lg:-mr-8 lg:pr-8" : ""}`}
+            className={`relative flex-1 group transition-[flex-grow] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:grow-[6] border-r border-white/10 -skew-x-6 bg-[#030712] ${isFirst ? "lg:-ml-8 lg:pl-8" : ""} ${isLast ? "lg:-mr-8 lg:pr-8" : ""}`}
         >
             {/* Background Image Container - Clipped to Skew Shape */}
             <div className="absolute inset-0 z-0 overflow-hidden">
-                {/* Counter-skew wrapper for image (only at lg+ where parent is skewed) */}
-                <div className="w-full lg:w-[150%] h-full lg:-ml-[25%] lg:skew-x-6 relative">
+                {/* Counter-skew wrapper for image to keeping it straight */}
+                <div className="w-[150%] h-full -ml-[25%] skew-x-6 relative">
                     <img
                         src={step.imgHorizontal}
                         alt={step.title}
@@ -100,8 +100,8 @@ function MethodPhase({ step, i }: { step: any, i: number }) {
                 <div className="absolute inset-0 bg-black/5 group-hover:opacity-0 transition-opacity duration-700 z-[2]"></div>
             </div>
 
-            {/* Content Container - Counter Skewed (only at lg+) */}
-            <div className={`absolute inset-0 z-20 lg:skew-x-6 flex flex-col items-center pointer-events-none ${i % 2 === 0 ? "justify-end pb-8 lg:pb-12" : "justify-start pt-24 lg:pt-32"}`}>
+            {/* Content Container - Counter Skewed - Visible Overflow for Letter */}
+            <div className={`absolute inset-0 z-20 skew-x-6 flex flex-col items-center pointer-events-none ${i % 2 === 0 ? "justify-end pb-8 lg:pb-12" : "justify-start pt-24 lg:pt-32"}`}>
 
                 {/* Letter & Circle Animated Container - RESTORED EXACT POSITIONING & ANIMATION */}
                 <div
@@ -168,31 +168,116 @@ export default function MetodoSection() {
     // Removed CTA logic - Moving to EquipoSection for cleaner transition
 
     return (
-        <section ref={sectionRef} id="metodologia" className="relative lg:sticky lg:top-0 z-0 min-h-[100svh] lg:h-screen lg:mb-[90vh] overflow-hidden bg-[#023566] text-white flex flex-col pt-12 pb-20 lg:pt-0 lg:pb-0">
+        <div id="metodologia">
+            {/* ============================================================
+                DESKTOP: original sticky accordion (untouched).
+               ============================================================ */}
+            <section ref={sectionRef} className="hidden lg:flex sticky top-0 z-0 h-screen mb-[90vh] overflow-hidden bg-[#023566] text-white flex-col">
 
-            {/* Header Intro */}
-            <div className="w-full px-4 md:px-8 lg:px-16 py-12 lg:pt-12 lg:pb-8 bg-[#023566] relative z-10">
-                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                    <div className="text-left">
-                        <span className="text-amarillo font-mono text-sm uppercase tracking-widest block mb-2">
+                {/* Header Intro */}
+                <div className="w-full px-4 md:px-8 lg:px-16 py-12 lg:pt-12 lg:pb-8 bg-[#023566] relative z-10">
+                    <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                        <div className="text-left">
+                            <span className="text-amarillo font-mono text-sm uppercase tracking-widest block mb-2">
+                                // Nuestro Framework
+                            </span>
+                            <h2 className="text-white text-3xl lg:text-4xl font-black">
+                                Método S.E.N.T.I.D.O.
+                            </h2>
+                        </div>
+                        <p className="text-gray-400 text-sm lg:text-base max-w-xl border-l-4 border-amarillo pl-4">
+                            Framework de Posicionamiento Estratégico. Un proceso lineal y evolutivo.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Accordion Container */}
+                <div className="flex flex-col lg:flex-row flex-1 w-full relative z-20 lg:gap-2 lg:mt-20">
+                    {methodSteps.map((step, i) => (
+                        <MethodPhase key={i} step={step} i={i} />
+                    ))}
+                </div>
+            </section>
+
+            {/* ============================================================
+                MOBILE: simple stacked cards. Same anchor id so navigation
+                still works. Hidden from lg+ so desktop is unaffected.
+               ============================================================ */}
+            <section className="lg:hidden bg-[#023566] text-white py-16 px-4 sm:px-6">
+                <div className="max-w-2xl mx-auto">
+                    <div className="mb-10">
+                        <span className="text-amarillo font-mono text-xs uppercase tracking-widest block mb-3">
                             // Nuestro Framework
                         </span>
-                        <h2 className="text-white text-3xl lg:text-4xl font-black">
+                        <h2 className="text-white text-3xl sm:text-4xl font-black mb-4">
                             Método S.E.N.T.I.D.O.
                         </h2>
+                        <p className="text-gray-300 text-sm border-l-4 border-amarillo pl-4">
+                            Framework de Posicionamiento Estratégico. Un proceso lineal y evolutivo.
+                        </p>
                     </div>
-                    <p className="text-gray-400 text-sm lg:text-base max-w-xl border-l-4 border-amarillo pl-4">
-                        Framework de Posicionamiento Estratégico. Un proceso lineal y evolutivo.
-                    </p>
-                </div>
-            </div>
 
-            {/* Accordion Container */}
-            <div className="flex flex-col lg:flex-row flex-1 w-full relative z-20 gap-12 lg:gap-2 mt-12 lg:mt-20 px-4 lg:px-0">
-                {methodSteps.map((step, i) => (
-                    <MethodPhase key={i} step={step} i={i} />
-                ))}
-            </div>
-        </section>
+                    <div className="flex flex-col gap-6">
+                        {methodSteps.map((step, i) => (
+                            <article
+                                key={i}
+                                className="relative bg-[#030712] border border-white/10 overflow-hidden shadow-xl"
+                            >
+                                {/* Top accent line in step's color */}
+                                <div
+                                    className="absolute top-0 left-0 w-full h-1.5 z-20"
+                                    style={{ backgroundColor: step.color }}
+                                />
+
+                                {/* Image */}
+                                <div className="relative w-full aspect-[16/10] overflow-hidden">
+                                    <img
+                                        src={step.imgVertical}
+                                        alt={step.title}
+                                        loading="lazy"
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/40 to-transparent" />
+
+                                    {/* Letter circle */}
+                                    <div
+                                        className="absolute top-4 left-4 w-14 h-14 rounded-full border-[3px] flex items-center justify-center bg-[#030712]/80 backdrop-blur-sm"
+                                        style={{ borderColor: step.color }}
+                                    >
+                                        <span
+                                            className="text-2xl font-black leading-none"
+                                            style={{ color: step.color }}
+                                        >
+                                            {step.char}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="px-5 pt-5 pb-6">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <span className="text-[10px] font-mono text-amarillo uppercase tracking-[0.3em]">
+                                            Fase 0{i + 1}
+                                        </span>
+                                        <div className="h-3 w-[1px] bg-white/30" />
+                                        <span className="text-[10px] font-bold text-white/80 uppercase tracking-[0.2em]">
+                                            {step.subtitle}
+                                        </span>
+                                    </div>
+
+                                    <h3 className="text-2xl font-black text-white mb-3 leading-tight">
+                                        {step.title}
+                                    </h3>
+
+                                    <p className="text-white/75 text-sm leading-relaxed">
+                                        {step.text}
+                                    </p>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        </div>
     );
 }

@@ -122,6 +122,17 @@ export default function EquipoSection() {
     }, [overlayDone]);
 
     useLayoutEffect(() => {
+        // GSAP pin / overlay timeline only makes sense on desktop where the
+        // 12-col CTA + 3D stairs + skewed slats are actually visible. On
+        // mobile we render an entirely separate, unpinned section below.
+        const isDesktop =
+            typeof window !== "undefined" &&
+            window.matchMedia("(min-width: 1024px)").matches;
+
+        if (!isDesktop) {
+            return;
+        }
+
         let ctx = gsap.context(() => {
             const tl = gsap.timeline({
                 scrollTrigger: {
@@ -162,7 +173,8 @@ export default function EquipoSection() {
     ];
 
     return (
-        <section ref={sectionRef} id="equipo" className="min-h-screen bg-[#023566] border-t border-border-dim relative z-10 overflow-hidden">
+        <div id="equipo">
+        <section ref={sectionRef} className="hidden lg:block min-h-screen bg-[#023566] border-t border-border-dim relative z-10 overflow-hidden">
 
             {/* PERMANENT GRADIENT BOTTOM */}
             <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-[#F33869] via-[#F33869]/20 to-transparent opacity-30 z-0 pointer-events-none"></div>
@@ -180,15 +192,15 @@ export default function EquipoSection() {
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay z-0"></div>
 
                 {/* MAIN GRID LAYOUT */}
-                <div className="absolute inset-0 w-full max-w-[1800px] mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-0 px-4 lg:px-8 items-center z-10 pointer-events-auto">
+                <div className="absolute inset-0 w-full max-w-[1800px] mx-auto h-full grid grid-cols-12 gap-0 px-8 items-center z-10 pointer-events-auto">
 
-                    {/* LEFT COLUMN: LOGOS MARQUEE (col-span-4) — hidden on phones to save room */}
+                    {/* LEFT COLUMN: LOGOS MARQUEE (col-span-4) */}
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.5 }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        className="hidden lg:flex lg:col-span-4 h-full relative flex-col justify-center border-r border-transparent"
+                        className="col-span-4 h-full relative flex flex-col justify-center border-r border-transparent"
                     >
                         {/* ELEGANT YELLOW SEPARATOR - RIGHT SIDE */}
                         <div className="absolute right-0 top-[15%] bottom-[15%] w-[1px] bg-gradient-to-b from-transparent via-amarillo/80 to-transparent z-30 shadow-[0_0_15px_rgba(255,193,7,0.5)]"></div>
@@ -207,7 +219,7 @@ export default function EquipoSection() {
                     </motion.div>
 
                     {/* CENTER COLUMN: EXPERIENCE TEXT (col-span-3) - CENTERED CONTENT */}
-                    <div className="col-span-1 lg:col-span-3 h-full flex flex-col justify-center items-center text-center relative z-20 px-4">
+                    <div className="col-span-3 h-full flex flex-col justify-center items-center text-center relative z-20 px-4">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             whileInView={{ opacity: 1, scale: 1 }}
@@ -216,10 +228,10 @@ export default function EquipoSection() {
                             className="flex flex-col items-center justify-center w-full"
                         >
                             <h3 className="font-bold text-white leading-none">
-                                <span className="block text-[80px] sm:text-[100px] md:text-[140px] lg:text-[180px] font-black text-amarillo tracking-tighter leading-[0.8]">
+                                <span className="block text-[120px] md:text-[180px] font-black text-amarillo tracking-tighter leading-[0.8]">
                                     +10
                                 </span>
-                                <span className="block text-2xl sm:text-3xl md:text-4xl mt-2 tracking-wide font-light">
+                                <span className="block text-3xl md:text-4xl mt-2 tracking-wide font-light">
                                     AÑOS DE<br />
                                     <strong className="font-black">EXPERIENCIA</strong>
                                 </span>
@@ -247,10 +259,8 @@ export default function EquipoSection() {
                         </motion.div>
                     </div>
 
-                    {/* RIGHT COLUMN: STAIRCASE (col-span-5) - LIFTED. Hidden on small
-                        viewports because the 3D perspective + 4000px depth doesn't
-                        translate to a phone-sized canvas. */}
-                    <div className="hidden lg:flex col-span-5 flex-col items-center justify-center relative perspective-[2000px] h-full z-20">
+                    {/* RIGHT COLUMN: STAIRCASE (col-span-5) - LIFTED */}
+                    <div className="col-span-5 flex flex-col items-center justify-center relative perspective-[2000px] h-full z-20">
                         <motion.div
                             initial="hidden"
                             whileInView="visible"
@@ -320,10 +330,10 @@ export default function EquipoSection() {
                 REAL TEAM SECTION (Slats Layout Restored)
                ============================================= */}
             <div className="w-full h-full flex items-center justify-center relative z-10 px-4 md:px-12 lg:px-20 overflow-visible py-10 md:-mt-20">
-                <div ref={teamScrollRef} className="max-w-[1900px] w-full flex flex-col md:flex-row items-center justify-center h-auto md:h-[50vh] gap-12 md:gap-12">
+                <div ref={teamScrollRef} className="max-w-[1900px] w-full flex flex-col md:flex-row items-center justify-center h-[50vh] gap-8 md:gap-12">
 
                     {/* --- LEFT BLOCK --- */}
-                    <div className="relative group z-30 flex-shrink-0 h-[380px] md:h-[450px] self-center ml-0 md:ml-8">
+                    <div className="relative group z-30 flex-shrink-0 h-[380px] md:h-[450px] self-center ml-8">
                         {/* SHADOW/FRAME - starts behind card, slides diagonally left-down */}
                         <motion.div
                             initial={{ x: 0, y: 0, skewX: -12 }}
@@ -387,7 +397,7 @@ export default function EquipoSection() {
                     </div>
 
                     {/* --- RIGHT: TEAM SLATS --- */}
-                    <div className="flex-1 flex flex-wrap md:flex-nowrap items-center justify-center h-full gap-y-20 gap-x-6 md:gap-12 pl-0 md:pl-4 mt-12 md:mt-0">
+                    <div className="flex-1 flex items-center justify-center h-full gap-12 pl-4">
                         {team.map((member, i) => {
                             let extraShift = "";
                             if (member.name.includes("Biluz")) extraShift = "translate-x-[-8%]";
@@ -415,7 +425,7 @@ export default function EquipoSection() {
                                         ? { duration: 0.3, ease: "easeOut" }
                                         : { duration: 1.2, delay: i * 0.18, ease: [0.25, 0.1, 0.25, 1.0] }
                                     }
-                                    className="relative group w-[110px] sm:w-[120px] md:w-[130px] lg:w-[160px] h-[300px] sm:h-[340px] md:h-[450px] z-10 hover:z-50"
+                                    className="relative group md:w-[130px] lg:w-[160px] h-[380px] md:h-[450px] z-10 hover:z-50"
                                 >
 
                                     <div className="absolute inset-0 bg-[#F33869] skew-x-[-12deg] shadow-xl group-hover:bg-magenta transition-colors duration-300 overflow-visible">
@@ -480,5 +490,160 @@ export default function EquipoSection() {
                 </div>
             </div>
         </section>
+
+        {/* ============================================================
+            MOBILE: simplified, always-visible CTA + team grid. No GSAP
+            pin, no skewed slats. Same anchor (parent #equipo wrapper).
+           ============================================================ */}
+        <section className="lg:hidden bg-[#023566] border-t border-border-dim relative overflow-hidden py-16 px-4 sm:px-6">
+            {/* Subtle gradient bottom (mirrors desktop accent) */}
+            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#F33869]/20 to-transparent pointer-events-none" />
+
+            <div className="relative z-10 max-w-2xl mx-auto">
+                {/* Section eyebrow */}
+                <div className="text-center mb-10">
+                    <span className="text-amarillo font-mono text-xs uppercase tracking-widest block mb-2">
+                        // Mentes Maestras
+                    </span>
+                    <h2 className="text-white text-3xl sm:text-4xl font-black uppercase tracking-tight">
+                        Nuestro Equipo
+                    </h2>
+                </div>
+
+                {/* +10 AÑOS card */}
+                <div className="relative mb-12 overflow-hidden bg-gradient-to-br from-azul-primary to-magenta border border-white/10 px-6 py-10 shadow-2xl text-center">
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+                    <div className="relative">
+                        <span className="block text-[80px] sm:text-[100px] font-black text-amarillo tracking-tighter leading-[0.85]">
+                            +10
+                        </span>
+                        <span className="block text-2xl sm:text-3xl font-light text-white tracking-wide mt-1">
+                            AÑOS DE <strong className="font-black">EXPERIENCIA</strong>
+                        </span>
+                        <p className="text-white/80 text-sm mt-5 max-w-xs mx-auto leading-relaxed">
+                            Transformando marcas con estrategias de alto impacto.
+                        </p>
+                        <a
+                            href="#contacto"
+                            className="inline-flex items-center justify-center gap-3 bg-white text-azul-primary px-8 py-3 mt-7 font-bold text-xs uppercase tracking-widest active:scale-95 transition-transform"
+                        >
+                            Comenzar Proyecto
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                {/* Líderes intro card */}
+                <div className="relative bg-white px-6 py-8 mb-10 shadow-xl text-center overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-magenta via-amarillo to-azul-electric" />
+
+                    <div className="flex justify-center mb-4">
+                        <Image
+                            src="/logo2.png"
+                            alt="Luciérnaga"
+                            width={140}
+                            height={32}
+                            className="object-contain"
+                        />
+                    </div>
+
+                    <h3 className="text-lg font-bold mb-2" style={{ color: '#023566' }}>
+                        Somos
+                    </h3>
+
+                    <div className="inline-block bg-magenta px-6 py-2 mb-3 shadow-lg">
+                        <span className="block text-white text-3xl sm:text-4xl font-black uppercase tracking-tight">
+                            Líderes
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 justify-center my-3">
+                        <div className="h-[2px] w-8 bg-amarillo" />
+                        <div className="h-[6px] w-[6px] bg-amarillo rotate-45" />
+                        <div className="h-[2px] w-8 bg-amarillo" />
+                    </div>
+
+                    <p className="text-gray-500 text-xs max-w-[280px] mx-auto font-medium leading-relaxed mb-5">
+                        Un equipo multidisciplinario que transforma visiones en resultados.
+                    </p>
+
+                    <div className="flex flex-col gap-2 max-w-[260px] mx-auto">
+                        <div className="flex items-center gap-3 bg-[#023566]/5 px-3 py-2 border-l-2 border-azul-electric">
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-[#023566]">Estrategia</span>
+                        </div>
+                        <div className="flex items-center gap-3 bg-magenta/5 px-3 py-2 border-l-2 border-magenta">
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-[#023566]">Creatividad</span>
+                        </div>
+                        <div className="flex items-center gap-3 bg-amarillo/5 px-3 py-2 border-l-2 border-amarillo">
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-[#023566]">Tecnología</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Team Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                    {team.map((member, i) => {
+                        const linkedinUrl = member.linkedin && member.linkedin !== "#" ? member.linkedin : null;
+                        const inner = (
+                            <>
+                                {/* Photo */}
+                                <div className="relative w-full aspect-[3/4] bg-gradient-to-b from-[#F33869] to-[#a01640] overflow-hidden">
+                                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+                                    <div className="absolute inset-x-0 bottom-0 top-2 flex items-end justify-center">
+                                        <Image
+                                            src={member.image}
+                                            alt={member.name}
+                                            fill
+                                            loading="lazy"
+                                            sizes="(max-width: 640px) 50vw, 200px"
+                                            className="object-contain object-bottom drop-shadow-xl"
+                                        />
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                                </div>
+
+                                {/* Label */}
+                                <div className="px-3 py-3 bg-[#001021] border-t-2 border-magenta">
+                                    <h4 className="text-white font-bold text-xs uppercase tracking-tight leading-tight">
+                                        {member.name}
+                                    </h4>
+                                    <p className="text-amarillo text-[9px] font-bold uppercase tracking-widest mt-1">
+                                        {member.role}
+                                    </p>
+                                </div>
+
+                                {/* Bio */}
+                                <div className="px-3 pb-4 bg-[#001021]">
+                                    <p className="text-gray-300 text-[11px] leading-relaxed font-light">
+                                        {member.description}
+                                    </p>
+                                </div>
+                            </>
+                        );
+
+                        const baseCls = "relative block overflow-hidden shadow-lg";
+
+                        return linkedinUrl ? (
+                            <a
+                                key={i}
+                                href={linkedinUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={baseCls}
+                            >
+                                {inner}
+                            </a>
+                        ) : (
+                            <div key={i} className={baseCls}>
+                                {inner}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+        </div>
     );
 }

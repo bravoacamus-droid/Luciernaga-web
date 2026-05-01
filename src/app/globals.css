@@ -380,16 +380,6 @@ p {
     line-height: 1.05;
   }
 
-  /* MetodoSection: skewed phase columns are unreadable when stacked.
-     Neutralize the skew in the column flow on phones. */
-  #metodologia .-skew-x-6 {
-    transform: skewX(0deg) !important;
-  }
-
-  #metodologia [class*="skew-x-6"] {
-    transform: skewX(0deg) !important;
-  }
-
   /* ProyectosSection overlays: shorten heading line-height & padding */
   #proyectos h2 {
     line-height: 1.05;
