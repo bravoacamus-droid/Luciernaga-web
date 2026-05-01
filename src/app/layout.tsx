@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { League_Spartan, Public_Sans } from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/components/providers/LenisProvider";
@@ -41,6 +41,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
   },
+  formatDetection: {
+    telephone: true,
+    email: true,
+    address: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#010b14" },
+    { media: "(prefers-color-scheme: dark)", color: "#010b14" },
+  ],
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

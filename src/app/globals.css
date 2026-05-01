@@ -51,6 +51,11 @@
 html {
   background-color: var(--bg-dark);
   color: var(--text-primary);
+  /* Prevent iOS Safari font auto-scaling on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Stop iOS rubber-band white flash on overscroll */
+  overscroll-behavior-y: none;
 }
 
 /* OPTIMIZATION: Disable native smooth scroll when using Lenis */
@@ -76,8 +81,46 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Stop double-tap zoom on iOS, kill the gray tap flash */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  /* Avoid pull-to-refresh on Android Chrome / Safari iOS */
+  overscroll-behavior-y: none;
   /* Typography Optimization */
+}
+
+/* iOS Safari: prevent input zoom on focus (must be >=16px) */
+input,
+textarea,
+select {
+  font-size: max(16px, 1rem);
+  /* Restore tap highlight transparency on form fields */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Force buttons/links to be properly tappable on iOS */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Honor iPhone safe areas (notch, home indicator) on fixed/sticky elements */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* === OPTIMIZACIONES DE RENDIMIENTO === */
@@ -233,4 +276,184 @@ p {
 .section-spacing {
   padding-top: 8rem;
   padding-bottom: 8rem;
+}
+
+/* ================================================================
+   MOBILE / iOS SAFARI / SMALL VIEWPORT RESPONSIVE FIXES
+   These rules ONLY apply at small viewports or to touch devices.
+   They do NOT modify the desktop view.
+   ================================================================ */
+
+/* Tighten typography clamp on phones so big headings never overflow */
+@media (max-width: 640px) {
+  h1 {
+    font-size: clamp(2.25rem, 9vw, 3.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 7vw, 2.75rem);
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+  }
+
+  p {
+    font-size: 1rem;
+  }
+
+  .wrapper {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .section-spacing {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+
+  /* Buttons: less squishy on small screens */
+  .btn-primary,
+  .btn-outline {
+    padding: 0.875rem 1.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Touch devices: kill hover-only states and CustomCursor leftovers,
+   force the "default" visual state to be the "hovered" content state
+   for the few sections that hide info behind hover. */
+@media (hover: none) and (pointer: coarse) {
+
+  /* MetodoSection: phases reveal text on hover. On touch, expand by default. */
+  #metodologia .group .max-h-0.opacity-0 {
+    max-height: 500px !important;
+    opacity: 1 !important;
+    transform: none !important;
+    margin-top: 1.5rem !important;
+  }
+
+  /* AboutSection / cards: drop the heavy hover transforms that don't make
+     sense on touch (the offset shadow frames stay, just no extra slide). */
+  #nosotros .group:hover .group-hover\:-translate-x-1 {
+    transform: none;
+  }
+
+  /* ServiciosSection: don't hide the description block on touch */
+  #servicios .group\/list:hover .group-hover\/list\:opacity-40 {
+    opacity: 1 !important;
+  }
+
+  /* EquipoSection: bio popup needs a tap target on touch — keep visible
+     close to the card so users can read without hover */
+  #equipo .group .group-hover\:opacity-100.group-hover\:translate-y-0 {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+}
+
+/* Safari (mac & iOS) specific: backdrop-filter + 3D transforms can
+   cause flicker on the deep-blue cards. Force GPU compositing. */
+@supports (-webkit-touch-callout: none) {
+
+  .backdrop-blur-xl,
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .backdrop-blur-2xl {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* iOS Safari treats 100vh as the largest viewport (incl. toolbar).
+     Use small/dynamic viewport height for the hero / pinned sections
+     to prevent layout shift when the URL bar collapses. */
+  .ios-vh-fix {
+    height: 100svh;
+    min-height: 100svh;
+  }
+}
+
+/* Phones: rein in massive vw-based typography and stuck horizontal layouts */
+@media (max-width: 768px) {
+
+  /* HeroSection text-back / text-front: cap at usable phone size */
+  #inicio h2 span {
+    line-height: 1.05;
+  }
+
+  /* MetodoSection: skewed phase columns are unreadable when stacked.
+     Neutralize the skew in the column flow on phones. */
+  #metodologia .-skew-x-6 {
+    transform: skewX(0deg) !important;
+  }
+
+  #metodologia [class*="skew-x-6"] {
+    transform: skewX(0deg) !important;
+  }
+
+  /* ProyectosSection overlays: shorten heading line-height & padding */
+  #proyectos h2 {
+    line-height: 1.05;
+  }
+
+  /* ContactoSection: form padding and skew break on phones */
+  #contacto .-skew-x-3 {
+    transform: skewX(0deg) !important;
+  }
+
+  #contacto .skew-x-3 {
+    transform: skewX(0deg) !important;
+  }
+
+  /* CursosSection folder card is a fixed 550x850 — scale the parent
+     carousel wrapper so the card fits the viewport without fighting
+     framer-motion transforms inside. */
+  .cursos-carousel-scale {
+    transform: scale(0.55);
+    transform-origin: center center;
+  }
+}
+
+/* Slightly larger phones / phablets */
+@media (min-width: 480px) and (max-width: 768px) {
+  .cursos-carousel-scale {
+    transform: scale(0.7);
+  }
+}
+
+/* iPad-ish / sm tablets: keep the desktop fan but clamp paddings */
+@media (min-width: 640px) and (max-width: 1024px) {
+
+  #equipo .col-span-4,
+  #equipo .col-span-3,
+  #equipo .col-span-5 {
+    /* The CTA grid is rigid 12-col — let it breathe on tablet */
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Mac Safari & iOS: prevent flash-of-overflowing-skewed-content on
+   scrollable containers with skewX */
+.skew-x-\[-12deg\],
+.skew-x-\[-10deg\],
+.skew-x-\[-8deg\],
+.skew-x-\[-6deg\],
+.skew-x-\[-3deg\] {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Long-press image / link callout off (iOS) */
+img,
+video {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Inputs/textareas remain selectable */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
 }

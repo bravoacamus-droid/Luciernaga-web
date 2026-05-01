@@ -63,10 +63,10 @@ export default function HeroSection() {
         <section
             ref={containerRef}
             id="inicio"
-            className="relative w-full h-[180vh] md:h-[180vh]"
+            className="relative w-full h-[180svh] md:h-[180vh]"
         >
             <div
-                className="fixed top-0 left-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden z-0"
+                className="fixed top-0 left-0 h-[100svh] md:h-screen w-full flex flex-col items-center justify-center overflow-hidden z-0"
                 style={{
                     background: 'linear-gradient(180deg, #010b14 0%, #023566 50%, #1F3FEA 100%)'
                 }}
@@ -162,7 +162,7 @@ export default function HeroSection() {
                     className="absolute top-0 w-full text-center text-white uppercase tracking-[0.15em] z-30 pointer-events-none px-6 md:px-20"
                 >
                     <span
-                        className="block mt-[calc(56vh+22vw)] md:mt-[calc(56vh+15vw)] text-[2.5vw] md:text-[1vw] font-medium leading-relaxed"
+                        className="block mt-[calc(56vh+22vw)] md:mt-[calc(56vh+15vw)] text-[clamp(0.75rem,2.5vw,0.95rem)] md:text-[1vw] font-medium leading-relaxed max-w-md md:max-w-none mx-auto"
                     >
                         Diseñamos la arquitectura de influencia para el top 1% de líderes que exigen resultados medibles donde la comunicación convencional se detiene.
                     </span>

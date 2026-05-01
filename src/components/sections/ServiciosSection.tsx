@@ -318,11 +318,11 @@ export default function ServiciosSection() {
                 style={{ backgroundColor: '#ffffff' }}
             >
                 {/* Title */}
-                <div className="flex-1 flex items-center px-8 md:px-16 lg:px-24 pt-24">
+                <div className="flex-1 flex items-center px-6 sm:px-8 md:px-16 lg:px-24 pt-24">
                     <div className="max-w-6xl">
                         <h2
                             ref={titleRef}
-                            className="text-7xl md:text-9xl lg:text-[11rem] font-black uppercase leading-[0.88] tracking-tighter"
+                            className="text-4xl sm:text-6xl md:text-9xl lg:text-[11rem] font-black uppercase leading-[0.95] md:leading-[0.88] tracking-tighter"
                             style={{ color: '#023566' }}
                         >
                             Transformamos <span style={{ color: '#F33869' }}>ideas</span><br />
@@ -332,7 +332,7 @@ export default function ServiciosSection() {
                     </div>
                 </div>
                 {/* Footer Label */}
-                <div className="w-full py-24 px-8 md:px-16 lg:px-24" style={{ backgroundColor: '#023566' }}>
+                <div className="w-full py-12 lg:py-24 px-6 sm:px-8 md:px-16 lg:px-24" style={{ backgroundColor: '#023566' }}>
                     <span className="text-sm font-bold uppercase tracking-[0.4em] text-white/80">Servicios</span>
                     <div className="h-[1px] w-24 mt-3 bg-white/30"></div>
                 </div>
@@ -356,7 +356,7 @@ export default function ServiciosSection() {
                                 {/* LEFT Panel */}
                                 <div className="w-full lg:w-[40%] flex items-center justify-center px-4 lg:px-0 py-8 lg:py-0 lg:pl-12 xl:pl-16 relative z-20 bg-[#1F3FEA]">
                                     <div
-                                        className="w-full min-h-[75vh] px-8 md:px-10 lg:px-12 py-14 md:py-16 lg:py-20 relative overflow-hidden flex flex-col justify-center"
+                                        className="w-full min-h-0 lg:min-h-[75vh] px-6 sm:px-8 md:px-10 lg:px-12 py-8 md:py-12 lg:py-20 relative overflow-hidden flex flex-col justify-center"
                                         style={{
                                             backgroundColor: '#023566',
                                             boxShadow: '6px 6px 30px rgba(0,0,0,0.35)',

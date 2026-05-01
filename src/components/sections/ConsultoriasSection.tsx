@@ -123,6 +123,10 @@ export default function ConsultoriasSection() {
                             <div
                                 key={item.id}
                                 onMouseEnter={() => setActiveIndex(index)}
+                                onClick={() => setActiveIndex(index)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActiveIndex(index); }}
                                 className="group cursor-pointer flex items-center gap-4 transition-all duration-300"
                             >
                                 {/* Hover Circle Indicator */}

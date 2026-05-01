@@ -319,24 +319,28 @@ export default function CursosSection() {
                             <ChevronRight size={32} strokeWidth={3} />
                         </button>
 
-                        {/* Carousel Container */}
+                        {/* Carousel Container — `cursos-carousel-scale` is a
+                            no-op on desktop and shrinks the whole stage on
+                            phones via globals.css media queries */}
                         <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                            <AnimatePresence>
-                                {courses.map((course, index) => (
-                                    <FolderCard
-                                        key={course.id}
-                                        course={course}
-                                        isActive={index === activeIndex}
-                                        isOpen={isOpen}
-                                        positionState={getPositionState(index)}
-                                        onClick={() => {
-                                            const pos = getPositionState(index);
-                                            if (pos === 'left') handleSlideChange('prev');
-                                            if (pos === 'right') handleSlideChange('next');
-                                        }}
-                                    />
-                                ))}
-                            </AnimatePresence>
+                            <div className="relative w-full h-full flex items-center justify-center cursos-carousel-scale">
+                                <AnimatePresence>
+                                    {courses.map((course, index) => (
+                                        <FolderCard
+                                            key={course.id}
+                                            course={course}
+                                            isActive={index === activeIndex}
+                                            isOpen={isOpen}
+                                            positionState={getPositionState(index)}
+                                            onClick={() => {
+                                                const pos = getPositionState(index);
+                                                if (pos === 'left') handleSlideChange('prev');
+                                                if (pos === 'right') handleSlideChange('next');
+                                            }}
+                                        />
+                                    ))}
+                                </AnimatePresence>
+                            </div>
                         </div>
                     </div>
 

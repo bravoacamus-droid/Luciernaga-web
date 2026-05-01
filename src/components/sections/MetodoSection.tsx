@@ -78,12 +78,12 @@ function MethodPhase({ step, i }: { step: any, i: number }) {
 
     return (
         <div
-            className={`relative flex-1 group transition-[flex-grow] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:grow-[6] border-r border-white/10 -skew-x-6 bg-[#030712] ${isFirst ? "lg:-ml-8 lg:pl-8" : ""} ${isLast ? "lg:-mr-8 lg:pr-8" : ""}`}
+            className={`relative flex-1 min-h-[260px] lg:min-h-0 group transition-[flex-grow] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:grow-[6] border-r border-white/10 lg:-skew-x-6 bg-[#030712] ${isFirst ? "lg:-ml-8 lg:pl-8" : ""} ${isLast ? "lg:-mr-8 lg:pr-8" : ""}`}
         >
             {/* Background Image Container - Clipped to Skew Shape */}
             <div className="absolute inset-0 z-0 overflow-hidden">
-                {/* Counter-skew wrapper for image to keeping it straight */}
-                <div className="w-[150%] h-full -ml-[25%] skew-x-6 relative">
+                {/* Counter-skew wrapper for image (only at lg+ where parent is skewed) */}
+                <div className="w-full lg:w-[150%] h-full lg:-ml-[25%] lg:skew-x-6 relative">
                     <img
                         src={step.imgHorizontal}
                         alt={step.title}
@@ -100,8 +100,8 @@ function MethodPhase({ step, i }: { step: any, i: number }) {
                 <div className="absolute inset-0 bg-black/5 group-hover:opacity-0 transition-opacity duration-700 z-[2]"></div>
             </div>
 
-            {/* Content Container - Counter Skewed - Visible Overflow for Letter */}
-            <div className={`absolute inset-0 z-20 skew-x-6 flex flex-col items-center pointer-events-none ${i % 2 === 0 ? "justify-end pb-8 lg:pb-12" : "justify-start pt-24 lg:pt-32"}`}>
+            {/* Content Container - Counter Skewed (only at lg+) */}
+            <div className={`absolute inset-0 z-20 lg:skew-x-6 flex flex-col items-center pointer-events-none ${i % 2 === 0 ? "justify-end pb-8 lg:pb-12" : "justify-start pt-24 lg:pt-32"}`}>
 
                 {/* Letter & Circle Animated Container - RESTORED EXACT POSITIONING & ANIMATION */}
                 <div
@@ -168,7 +168,7 @@ export default function MetodoSection() {
     // Removed CTA logic - Moving to EquipoSection for cleaner transition
 
     return (
-        <section ref={sectionRef} id="metodologia" className="sticky top-0 z-0 h-screen mb-[90vh] overflow-hidden bg-[#023566] text-white flex flex-col">
+        <section ref={sectionRef} id="metodologia" className="relative lg:sticky lg:top-0 z-0 min-h-[100svh] lg:h-screen lg:mb-[90vh] overflow-hidden bg-[#023566] text-white flex flex-col pt-12 pb-20 lg:pt-0 lg:pb-0">
 
             {/* Header Intro */}
             <div className="w-full px-4 md:px-8 lg:px-16 py-12 lg:pt-12 lg:pb-8 bg-[#023566] relative z-10">
@@ -188,7 +188,7 @@ export default function MetodoSection() {
             </div>
 
             {/* Accordion Container */}
-            <div className="flex flex-col lg:flex-row flex-1 w-full relative z-20 lg:gap-2 lg:mt-20">
+            <div className="flex flex-col lg:flex-row flex-1 w-full relative z-20 gap-12 lg:gap-2 mt-12 lg:mt-20 px-4 lg:px-0">
                 {methodSteps.map((step, i) => (
                     <MethodPhase key={i} step={step} i={i} />
                 ))}

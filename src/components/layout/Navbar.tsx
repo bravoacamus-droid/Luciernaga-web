@@ -55,12 +55,12 @@ export default function Navbar() {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${isScrolled
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b safe-top ${isScrolled
                     ? "bg-bg-dark/80 backdrop-blur-md border-border-light py-4"
                     : "bg-transparent border-transparent py-6"
                     }`}
             >
-                <div className="wrapper flex items-center justify-between relative">
+                <div className="wrapper flex items-center justify-between relative safe-x">
 
                     {/* IZQUIERDA: Botón Hamburguesa Animado */}
                     <motion.button
