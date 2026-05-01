@@ -203,7 +203,7 @@ export default function MetodoSection() {
                 MOBILE: simple stacked cards. Same anchor id so navigation
                 still works. Hidden from lg+ so desktop is unaffected.
                ============================================================ */}
-            <section className="lg:hidden bg-[#023566] text-white py-16 px-4 sm:px-6">
+            <section className="lg:hidden relative z-10 bg-[#023566] text-white py-16 px-4 sm:px-6">
                 <div className="max-w-2xl mx-auto">
                     <div className="mb-10">
                         <span className="text-amarillo font-mono text-xs uppercase tracking-widest block mb-3">

@@ -495,7 +495,7 @@ export default function EquipoSection() {
             MOBILE: simplified, always-visible CTA + team grid. No GSAP
             pin, no skewed slats. Same anchor (parent #equipo wrapper).
            ============================================================ */}
-        <section className="lg:hidden bg-[#023566] border-t border-border-dim relative overflow-hidden py-16 px-4 sm:px-6">
+        <section className="lg:hidden relative z-10 bg-[#023566] border-t border-border-dim overflow-hidden py-16 px-4 sm:px-6">
             {/* Subtle gradient bottom (mirrors desktop accent) */}
             <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#F33869]/20 to-transparent pointer-events-none" />
 
@@ -532,6 +532,46 @@ export default function EquipoSection() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
                         </a>
+                    </div>
+                </div>
+
+                {/* Logos clientes - horizontal marquee */}
+                <div className="mb-12 -mx-4 sm:-mx-6">
+                    <div className="text-center mb-4 px-4">
+                        <span className="text-amarillo/80 font-mono text-[10px] uppercase tracking-[0.3em]">
+                            Confían en nosotros
+                        </span>
+                    </div>
+                    <div
+                        className="relative w-full overflow-hidden py-2"
+                        style={{
+                            maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+                            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+                        }}
+                    >
+                        <motion.div
+                            className="flex gap-3 w-max"
+                            animate={{ x: ['0%', '-50%'] }}
+                            transition={{ duration: 60, ease: 'linear', repeat: Infinity }}
+                        >
+                            {[...logoFiles, ...logoFiles].map((logo, idx) => (
+                                <div
+                                    key={idx}
+                                    className="w-20 h-20 bg-white rounded-xl flex items-center justify-center p-2.5 shadow-lg flex-shrink-0"
+                                >
+                                    <div className="relative w-full h-full">
+                                        <Image
+                                            src={`/images/logos/${logo}`}
+                                            alt="Logo cliente"
+                                            fill
+                                            loading="lazy"
+                                            sizes="80px"
+                                            className="object-contain"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </motion.div>
                     </div>
                 </div>
 
