@@ -168,7 +168,11 @@ export default function MetodoSection() {
     // Removed CTA logic - Moving to EquipoSection for cleaner transition
 
     return (
-        <div id="metodologia">
+        // `flow-root` prevents the desktop section's `mb-[90vh]` margin from
+        // collapsing OUT of this wrapper. Without it, the wrapper's height is
+        // only 100vh (section's `h-screen`) and the sticky un-sticks 90vh
+        // early, leaving a hero-shows-through gap before EquipoSection.
+        <div id="metodologia" className="flow-root">
             {/* ============================================================
                 DESKTOP: original sticky accordion (untouched).
                ============================================================ */}
