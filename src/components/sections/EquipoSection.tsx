@@ -173,7 +173,7 @@ export default function EquipoSection() {
     ];
 
     return (
-        <div id="equipo">
+        <div id="equipo" className="contents">
         <section ref={sectionRef} className="hidden lg:block min-h-screen bg-[#023566] border-t border-border-dim relative z-10 overflow-hidden">
 
             {/* PERMANENT GRADIENT BOTTOM */}
