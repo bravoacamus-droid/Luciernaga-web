@@ -138,6 +138,31 @@ export default function ProyectosSection() {
     const set1 = projectImages.slice(0, 9);
     const set2 = projectImages.slice(9, 18);
 
+    // Mobile-only object-position overrides per image id.
+    // Desktop (lg+) keeps the default 50% 50% (centered) — `max-lg:` prefix
+    // ensures these only apply below the lg breakpoint (Android/iOS phones
+    // and small tablets), so the desktop puzzle/grid layout is untouched.
+    const mobilePositionFor = (id: number): string => {
+        const map: Record<number, string> = {
+            // SET 1 — B&W (1-9)
+            // #2 (top row middle): mover a la derecha / centrar mas
+            2: "max-lg:[object-position:65%_50%]",
+            // #5 (center of grid, row 2 middle): mover a la derecha
+            5: "max-lg:[object-position:70%_50%]",
+            // #6 (row 2 right): mover a la derecha
+            6: "max-lg:[object-position:70%_50%]",
+
+            // SET 2 — Color (10-18)
+            // #13 (row 2 first): mover a la izquierda
+            13: "max-lg:[object-position:30%_50%]",
+            // #15 (row 2 third): mover a la izquierda
+            15: "max-lg:[object-position:30%_50%]",
+            // #16 (row 3 first): un poquito mas a la derecha
+            16: "max-lg:[object-position:60%_50%]",
+        };
+        return map[id] || "";
+    };
+
     return (
         <section ref={sectionRef} id="proyectos" className="relative w-full h-screen bg-black overflow-hidden">
 
@@ -151,7 +176,7 @@ export default function ProyectosSection() {
                                 src={img.src}
                                 alt={`Proyecto Luciernaga ${img.id}`}
                                 fill
-                                className="object-cover grayscale" // Black & White
+                                className={`object-cover grayscale ${mobilePositionFor(img.id)}`}
                             />
                         </div>
                     ))}
@@ -171,7 +196,7 @@ export default function ProyectosSection() {
                                     src={img.src}
                                     alt={`Proyecto Luciernaga ${img.id}`}
                                     fill
-                                    className="object-cover" // Color
+                                    className={`object-cover ${mobilePositionFor(img.id)}`}
                                 />
                             </div>
                         );
