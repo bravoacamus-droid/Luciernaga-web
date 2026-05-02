@@ -137,10 +137,11 @@ export default function EquipoSection() {
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: sectionRef.current,
-                    // Offset original de 70px (alinea con la altura del
-                    // navbar scrolleado); deja el titulo MENTES MAESTRAS
-                    // visible bajo el navbar.
-                    start: "top top+=70px",
+                    // Pin a top:0 para que el bg del section quede detras
+                    // del navbar transparente (sin banda hero-detras).
+                    // El titulo MENTES MAESTRAS se baja DENTRO del section
+                    // (top-[12%]) para no quedar tapado por el navbar.
+                    start: "top top",
                     end: "+=180%",
                     pin: true,
                     pinSpacing: true,
@@ -183,7 +184,7 @@ export default function EquipoSection() {
             <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-[#F33869] via-[#F33869]/20 to-transparent opacity-30 z-0 pointer-events-none"></div>
 
             {/* BACKGROUND TITLE */}
-            <div className="absolute top-[5%] left-0 w-full text-center pointer-events-none z-0 select-none">
+            <div className="absolute top-[12%] left-0 w-full text-center pointer-events-none z-0 select-none">
                 <h2 className="text-[12vw] font-black text-transparent bg-clip-text bg-gradient-to-b from-white/10 to-transparent leading-none tracking-tighter uppercase font-outline-2">
                     MENTES MAESTRAS
                 </h2>
