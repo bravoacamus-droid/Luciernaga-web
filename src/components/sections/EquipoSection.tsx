@@ -137,13 +137,10 @@ export default function EquipoSection() {
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: sectionRef.current,
-                    // Pin a top:0 (sin offset). El navbar fixed (z-50) cubre
-                    // la zona 0-75px desde arriba; con pin a 0 el bg del
-                    // section queda DETRAS del navbar en toda esa franja,
-                    // asi la transparencia del navbar (bg/80) revela el
-                    // color del section en lugar del hero detras -> evita
-                    // la banda fina visible entre navbar y section.
-                    start: "top top",
+                    // Offset original de 70px (alinea con la altura del
+                    // navbar scrolleado); deja el titulo MENTES MAESTRAS
+                    // visible bajo el navbar.
+                    start: "top top+=70px",
                     end: "+=180%",
                     pin: true,
                     pinSpacing: true,
