@@ -118,14 +118,14 @@ export default function ContactoSection() {
                                 <div className="space-y-10 pl-6">
                                     <div className="group cursor-pointer">
                                         <span className="block text-xs uppercase text-white/60 tracking-widest mb-2 group-hover:text-[#FFED00] transition-colors duration-300">Escríbenos</span>
-                                        <a href="mailto:hola@luciernaga.pe" className="text-xl lg:text-2xl font-bold text-white relative inline-block transition-transform duration-300 group-hover:translate-x-2 filter drop-shadow hidden-email-link">
-                                            hola@luciernaga.pe
+                                        <a href="mailto:biluzmeryfg@gmail.com" className="text-xl lg:text-2xl font-bold text-white relative inline-block transition-transform duration-300 group-hover:translate-x-2 filter drop-shadow hidden-email-link">
+                                            biluzmeryfg@gmail.com
                                         </a>
                                     </div>
                                     <div className="group cursor-pointer">
                                         <span className="block text-xs uppercase text-white/60 tracking-widest mb-2 group-hover:text-[#FFED00] transition-colors duration-300">Llámanos</span>
-                                        <a href="tel:+51999999999" className="text-xl lg:text-2xl font-bold text-white relative inline-block transition-transform duration-300 group-hover:translate-x-2 filter drop-shadow">
-                                            +51 999 999 999
+                                        <a href="tel:+51947557907" className="text-xl lg:text-2xl font-bold text-white relative inline-block transition-transform duration-300 group-hover:translate-x-2 filter drop-shadow">
+                                            +51 947 557 907
                                         </a>
                                     </div>
                                     <div className="flex gap-6 pt-4">
@@ -418,7 +418,7 @@ export default function ContactoSection() {
                                 <p>Gestionar las solicitudes de contacto, presupuestos y comunicaciones comerciales relacionadas con nuestros servicios.</p>
 
                                 <h4 className="text-white font-bold uppercase text-xs tracking-widest mt-4">3. Derechos</h4>
-                                <p>Tienes derecho a acceder, rectificar y suprimir tus datos, así como otros derechos, enviando un correo a hola@luciernaga.pe.</p>
+                                <p>Tienes derecho a acceder, rectificar y suprimir tus datos, así como otros derechos, enviando un correo a biluzmeryfg@gmail.com.</p>
 
                                 <h4 className="text-white font-bold uppercase text-xs tracking-widest mt-4">4. Seguridad</h4>
                                 <p>Implementamos medidas de seguridad técnicas y organizativas para proteger tus datos contra el acceso no autorizado o la pérdida.</p>
