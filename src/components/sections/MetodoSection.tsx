@@ -168,15 +168,19 @@ export default function MetodoSection() {
     // Removed CTA logic - Moving to EquipoSection for cleaner transition
 
     return (
-        // `flow-root` prevents the desktop section's `mb-[90vh]` margin from
-        // collapsing OUT of this wrapper. Without it, the wrapper's height is
-        // only 100vh (section's `h-screen`) and the sticky un-sticks 90vh
-        // early, leaving a hero-shows-through gap before EquipoSection.
-        <div id="metodologia" className="flow-root">
+        // CRITICAL: the wrapper needs to be 190vh on desktop so the sticky
+        // section's containing block extends full sticky duration. We use
+        // `lg:pb-[90vh]` (padding, not margin) on the wrapper because padding
+        // is part of the box height and is immune to margin-collapsing.
+        // On mobile the desktop section is display:none, so the wrapper is
+        // just the mobile section's natural height with no extra padding.
+        <div id="metodologia" className="lg:pb-[90vh]">
             {/* ============================================================
                 DESKTOP: original sticky accordion (untouched).
+                Note: `mb-[90vh]` removed from the section because the wrapper
+                now provides that space via padding-bottom (more reliable).
                ============================================================ */}
-            <section ref={sectionRef} className="hidden lg:flex sticky top-0 z-0 h-screen mb-[90vh] overflow-hidden bg-[#023566] text-white flex-col">
+            <section ref={sectionRef} className="hidden lg:flex sticky top-0 z-0 h-screen overflow-hidden bg-[#023566] text-white flex-col">
 
                 {/* Header Intro */}
                 <div className="w-full px-4 md:px-8 lg:px-16 py-12 lg:pt-12 lg:pb-8 bg-[#023566] relative z-10">
