@@ -51,6 +51,13 @@ export default function ConsultoriasSection() {
     const sectionRef = useRef<HTMLElement>(null);
 
     useLayoutEffect(() => {
+        // Pin solo en desktop. En mobile renderizamos un layout stackeado
+        // sin pin con la descripcion completa de cada consultoria visible.
+        const isDesktop =
+            typeof window !== "undefined" &&
+            window.matchMedia("(min-width: 1024px)").matches;
+        if (!isDesktop) return;
+
         const ctx = gsap.context(() => {
             ScrollTrigger.create({
                 trigger: sectionRef.current,
@@ -65,7 +72,8 @@ export default function ConsultoriasSection() {
     }, []);
 
     return (
-        <section ref={sectionRef} id="consultorias" className="relative w-full flex flex-col lg:flex-row h-screen overflow-hidden" style={{ backgroundColor: '#1F3FEA' }}>
+        <>
+        <section ref={sectionRef} id="consultorias" className="hidden lg:flex relative w-full flex-col lg:flex-row h-screen overflow-hidden" style={{ backgroundColor: '#1F3FEA' }}>
             {/* Top Separators - Estilo Corporativo & Notorio */}
             <div className="absolute top-0 left-0 w-full z-30 flex flex-col items-center">
                 {/* Línea Principal Fuerte (Borde de sección) */}
@@ -174,5 +182,67 @@ export default function ConsultoriasSection() {
 
             </div>
         </section>
+
+        {/* ============================================================
+            MOBILE: stacked cards with full description always visible.
+            No pin, no hover-driven swap — every consultoria shows its
+            image + tag + target + quote + desc inline.
+           ============================================================ */}
+        <section className="lg:hidden relative z-20 py-14 px-4 sm:px-6" style={{ backgroundColor: '#1F3FEA' }}>
+            {/* Section header */}
+            <div className="max-w-2xl mx-auto mb-10">
+                <h2 className="text-white text-sm font-mono tracking-widest uppercase mb-3 font-bold">
+                    Consultorías Especializadas
+                </h2>
+                <div className="h-[2px] w-16 bg-amarillo" />
+            </div>
+
+            <div className="max-w-2xl mx-auto flex flex-col gap-8">
+                {consultorias.map((item) => (
+                    <article
+                        key={item.id}
+                        className="bg-[#023566] shadow-2xl overflow-hidden"
+                    >
+                        {/* Image */}
+                        <div className="relative w-full aspect-[4/3] overflow-hidden bg-black/30">
+                            <Image
+                                src={item.image}
+                                alt={item.title}
+                                fill
+                                loading="lazy"
+                                sizes="(max-width: 640px) 100vw, 600px"
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#023566] via-transparent to-transparent" />
+                            {/* Tag badge */}
+                            <div className="absolute top-4 left-4">
+                                <span className="bg-[#FFED00] text-black px-3 py-1 rounded-full uppercase tracking-wider text-[10px] font-bold shadow-md">
+                                    {item.tag}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="px-5 pt-5 pb-6">
+                            <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
+                                {item.title}
+                            </h3>
+                            <p className="text-white/70 text-xs font-medium mb-4">
+                                {item.target}
+                            </p>
+
+                            <p className="text-white text-base font-light italic leading-snug border-l-2 border-amarillo pl-4 mb-4">
+                                {item.quote}
+                            </p>
+
+                            <p className="text-white/85 text-sm leading-relaxed font-medium">
+                                {item.desc}
+                            </p>
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </section>
+        </>
     );
 }

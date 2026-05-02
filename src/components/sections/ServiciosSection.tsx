@@ -145,6 +145,14 @@ export default function ServiciosSection() {
     const horizontalWrapperRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
+        // Desktop only: the GSAP timeline (stack pin, vertical panel slides
+        // and the 3D horizontal fan for Web Dev) is too complex for a phone
+        // viewport — mobile gets a separate stacked layout below.
+        const isDesktop =
+            typeof window !== "undefined" &&
+            window.matchMedia("(min-width: 1024px)").matches;
+        if (!isDesktop) return;
+
         const ctx = gsap.context(() => {
             // 1. Parallax title
             gsap.to(titleRef.current, {
@@ -310,7 +318,8 @@ export default function ServiciosSection() {
     }, []);
 
     return (
-        <div ref={sectionRef} id="servicios" className="relative z-20">
+        <div id="servicios" className="contents">
+        <div ref={sectionRef} className="hidden lg:block relative z-20">
 
             {/* ====== INTRO PANEL ====== */}
             <div
@@ -318,11 +327,11 @@ export default function ServiciosSection() {
                 style={{ backgroundColor: '#ffffff' }}
             >
                 {/* Title */}
-                <div className="flex-1 flex items-center px-6 sm:px-8 md:px-16 lg:px-24 pt-24">
+                <div className="flex-1 flex items-center px-8 md:px-16 lg:px-24 pt-24">
                     <div className="max-w-6xl">
                         <h2
                             ref={titleRef}
-                            className="text-4xl sm:text-6xl md:text-9xl lg:text-[11rem] font-black uppercase leading-[0.95] md:leading-[0.88] tracking-tighter"
+                            className="text-7xl md:text-9xl lg:text-[11rem] font-black uppercase leading-[0.88] tracking-tighter"
                             style={{ color: '#023566' }}
                         >
                             Transformamos <span style={{ color: '#F33869' }}>ideas</span><br />
@@ -332,7 +341,7 @@ export default function ServiciosSection() {
                     </div>
                 </div>
                 {/* Footer Label */}
-                <div className="w-full py-12 lg:py-24 px-6 sm:px-8 md:px-16 lg:px-24" style={{ backgroundColor: '#023566' }}>
+                <div className="w-full py-24 px-8 md:px-16 lg:px-24" style={{ backgroundColor: '#023566' }}>
                     <span className="text-sm font-bold uppercase tracking-[0.4em] text-white/80">Servicios</span>
                     <div className="h-[1px] w-24 mt-3 bg-white/30"></div>
                 </div>
@@ -356,7 +365,7 @@ export default function ServiciosSection() {
                                 {/* LEFT Panel */}
                                 <div className="w-full lg:w-[40%] flex items-center justify-center px-4 lg:px-0 py-8 lg:py-0 lg:pl-12 xl:pl-16 relative z-20 bg-[#1F3FEA]">
                                     <div
-                                        className="w-full min-h-0 lg:min-h-[75vh] px-6 sm:px-8 md:px-10 lg:px-12 py-8 md:py-12 lg:py-20 relative overflow-hidden flex flex-col justify-center"
+                                        className="w-full min-h-[75vh] px-8 md:px-10 lg:px-12 py-14 md:py-16 lg:py-20 relative overflow-hidden flex flex-col justify-center"
                                         style={{
                                             backgroundColor: '#023566',
                                             boxShadow: '6px 6px 30px rgba(0,0,0,0.35)',
@@ -561,6 +570,142 @@ export default function ServiciosSection() {
                     </div>
                 ))}
             </div>
+        </div>
+
+        {/* ============================================================
+            MOBILE: simple stacked service cards. Each service shows ALL
+            its info inline (no hover). Web Dev (06) shows the project
+            list as a vertical scroll instead of a 3D fan.
+           ============================================================ */}
+        <section className="lg:hidden relative z-20">
+            {/* Intro */}
+            <div className="bg-white px-6 sm:px-8 pt-24 pb-14">
+                <h2 className="text-4xl sm:text-5xl font-black uppercase leading-[0.95] tracking-tighter" style={{ color: '#023566' }}>
+                    Transformamos <span style={{ color: '#F33869' }}>ideas</span><br />
+                    en impacto, estrategia<br />
+                    en resultados.
+                </h2>
+            </div>
+            <div className="py-10 px-6 sm:px-8" style={{ backgroundColor: '#023566' }}>
+                <span className="text-sm font-bold uppercase tracking-[0.4em] text-white/80">Servicios</span>
+                <div className="h-[1px] w-24 mt-3 bg-white/30" />
+            </div>
+
+            {/* Service Cards */}
+            <div className="bg-[#1F3FEA] py-10 px-4 sm:px-6 flex flex-col gap-10">
+                {services.map((service, i) => (
+                    <article
+                        key={service.id}
+                        className="bg-[#023566] shadow-2xl overflow-hidden"
+                        style={{ boxShadow: '0 12px 30px rgba(0,0,0,0.35)' }}
+                    >
+                        <div className="px-6 pt-7 pb-6">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">
+                                {service.id} / 0{services.length}
+                            </span>
+                            <div className="h-[1px] w-12 bg-white/20 mt-3 mb-5" />
+
+                            <h3 className="text-3xl sm:text-4xl font-black text-white uppercase leading-[0.95] tracking-tight mb-4">
+                                {service.title}
+                            </h3>
+                            <p className="text-white/70 text-sm leading-relaxed mb-6">
+                                {service.description}
+                            </p>
+
+                            {/* Reel video for non-web services */}
+                            {service.videoPath && (
+                                <div className="relative w-full aspect-video bg-black/30 overflow-hidden border border-white/10 mb-6">
+                                    <video
+                                        className="w-full h-full object-cover"
+                                        loop
+                                        muted
+                                        playsInline
+                                        autoPlay
+                                        preload="metadata"
+                                    >
+                                        <source src={service.videoPath} type="video/mp4" />
+                                    </video>
+                                    <div className="absolute bottom-2 left-3 z-10">
+                                        <span className="text-white/80 text-[10px] font-mono uppercase tracking-wider bg-black/40 px-2 py-1 rounded">
+                                            Reel — {service.title}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Service items WITH descriptions visible */}
+                            <div className="flex flex-col">
+                                {service.items.map((item, j) => (
+                                    <div
+                                        key={j}
+                                        className="py-4 border-b border-white/10 last:border-b-0"
+                                    >
+                                        <div className="flex items-baseline gap-3 mb-2">
+                                            <span className="text-white/30 text-xs font-mono">
+                                                {String(j + 1).padStart(2, '0')}
+                                            </span>
+                                            <span className="text-white text-base font-medium tracking-tight">
+                                                {item.name}
+                                            </span>
+                                        </div>
+                                        <p className="text-white/50 text-xs leading-relaxed pl-7">
+                                            {item.description}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Web Dev: project showcase below the items */}
+                        {service.id === "06" && (
+                            <div className="bg-[#1F3FEA] px-6 py-8 border-t border-white/10">
+                                <h4 className="text-amarillo font-mono text-xs uppercase tracking-[0.3em] mb-1">
+                                    Casos de éxito
+                                </h4>
+                                <p className="text-white/60 text-xs mb-6">
+                                    Tap para visitar cada proyecto
+                                </p>
+                                <div className="flex flex-col gap-5">
+                                    {webProjects.map((project, k) => (
+                                        <a
+                                            key={k}
+                                            href={project.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block bg-[#023566] border border-white/10 overflow-hidden active:scale-[0.99] transition-transform"
+                                        >
+                                            <div className="relative w-full aspect-video bg-black/30 overflow-hidden">
+                                                <video
+                                                    className="w-full h-full object-cover"
+                                                    loop
+                                                    muted
+                                                    playsInline
+                                                    autoPlay
+                                                    preload="metadata"
+                                                >
+                                                    <source src={project.video} type="video/mp4" />
+                                                </video>
+                                            </div>
+                                            <div className="px-4 py-4 border-l-2 border-[#F33869]">
+                                                <h5 className="text-lg font-bold text-white uppercase leading-tight mb-1">
+                                                    {project.title}
+                                                </h5>
+                                                <p className="text-[10px] text-white/60 font-mono uppercase tracking-widest mb-2">
+                                                    {project.category}
+                                                </p>
+                                                <p className="text-white/70 text-xs leading-relaxed">
+                                                    {project.longDesc}
+                                                </p>
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </article>
+                ))}
+            </div>
+        </section>
         </div>
     );
 }

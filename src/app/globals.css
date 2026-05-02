@@ -394,20 +394,6 @@ p {
     transform: skewX(0deg) !important;
   }
 
-  /* CursosSection folder card is a fixed 550x850 — scale the parent
-     carousel wrapper so the card fits the viewport without fighting
-     framer-motion transforms inside. */
-  .cursos-carousel-scale {
-    transform: scale(0.55);
-    transform-origin: center center;
-  }
-}
-
-/* Slightly larger phones / phablets */
-@media (min-width: 480px) and (max-width: 768px) {
-  .cursos-carousel-scale {
-    transform: scale(0.7);
-  }
 }
 
 /* iPad-ish / sm tablets: keep the desktop fan but clamp paddings */

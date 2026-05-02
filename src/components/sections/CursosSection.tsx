@@ -282,8 +282,9 @@ export default function CursosSection() {
     };
 
     return (
-        // Adjusted height to 300vh to give plenty of pin time
-        <section ref={containerRef} id="cursos" className="relative w-full h-[150vh] bg-[#1F3FEA]">
+        <div id="cursos" className="contents">
+        {/* Desktop: original sticky carousel (untouched) */}
+        <section ref={containerRef} className="hidden lg:block relative w-full h-[150vh] bg-[#1F3FEA]">
 
             <div className="sticky top-0 w-full h-screen overflow-hidden flex flex-col">
 
@@ -319,28 +320,24 @@ export default function CursosSection() {
                             <ChevronRight size={32} strokeWidth={3} />
                         </button>
 
-                        {/* Carousel Container — `cursos-carousel-scale` is a
-                            no-op on desktop and shrinks the whole stage on
-                            phones via globals.css media queries */}
+                        {/* Carousel Container */}
                         <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                            <div className="relative w-full h-full flex items-center justify-center cursos-carousel-scale">
-                                <AnimatePresence>
-                                    {courses.map((course, index) => (
-                                        <FolderCard
-                                            key={course.id}
-                                            course={course}
-                                            isActive={index === activeIndex}
-                                            isOpen={isOpen}
-                                            positionState={getPositionState(index)}
-                                            onClick={() => {
-                                                const pos = getPositionState(index);
-                                                if (pos === 'left') handleSlideChange('prev');
-                                                if (pos === 'right') handleSlideChange('next');
-                                            }}
-                                        />
-                                    ))}
-                                </AnimatePresence>
-                            </div>
+                            <AnimatePresence>
+                                {courses.map((course, index) => (
+                                    <FolderCard
+                                        key={course.id}
+                                        course={course}
+                                        isActive={index === activeIndex}
+                                        isOpen={isOpen}
+                                        positionState={getPositionState(index)}
+                                        onClick={() => {
+                                            const pos = getPositionState(index);
+                                            if (pos === 'left') handleSlideChange('prev');
+                                            if (pos === 'right') handleSlideChange('next');
+                                        }}
+                                    />
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
 
@@ -390,5 +387,99 @@ export default function CursosSection() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#1F3FEA]/50 to-[#023566]/90 pointer-events-none"></div>
             </div>
         </section>
+
+        {/* ============================================================
+            MOBILE: simple stacked course cards. No 3D folder, no
+            sticky pin, no scaling tricks — every course shows its
+            badge, image, title, description and target inline.
+           ============================================================ */}
+        <section className="lg:hidden relative z-20 bg-[#1F3FEA] py-14 px-4 sm:px-6">
+            {/* Header */}
+            <div className="text-center mb-10">
+                <h2 className="text-3xl sm:text-4xl font-black text-white tracking-widest uppercase drop-shadow-md">
+                    CURSOS Y TALLERES
+                </h2>
+                <div className="w-20 h-1.5 bg-[#FFED00] mx-auto mt-3 shadow-[0_0_15px_rgba(255,237,0,0.6)]" />
+            </div>
+
+            <div className="max-w-2xl mx-auto flex flex-col gap-8">
+                {courses.map((course) => (
+                    <article
+                        key={course.id}
+                        className="bg-white shadow-2xl overflow-hidden relative"
+                    >
+                        {/* Decorative Top Stripe */}
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#F33869] to-[#1F3FEA] z-10" />
+
+                        {/* Badge */}
+                        <div className="px-6 pt-6 pb-2 flex items-center gap-3">
+                            <div className="bg-[#FFED00] text-[#023566] inline-flex items-center px-3 py-1">
+                                <span className="font-bold text-[10px] tracking-widest uppercase">
+                                    {course.type}
+                                </span>
+                            </div>
+                            <span className="bg-[#023566]/10 text-[#023566] text-[10px] font-bold px-2 py-1 uppercase tracking-wider border border-[#023566]/20">
+                                {course.detail}
+                            </span>
+                        </div>
+
+                        {/* Hero image */}
+                        <div className="relative w-full aspect-video bg-gray-50 overflow-hidden flex items-center justify-center px-8 pt-4 pb-6">
+                            <Image
+                                src={`/images/cursos/${course.imgName}`}
+                                alt={course.title}
+                                width={500}
+                                height={400}
+                                loading="lazy"
+                                className="object-contain max-h-full w-auto drop-shadow-xl"
+                            />
+                        </div>
+
+                        {/* Content */}
+                        <div className="px-6 pb-7">
+                            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight mb-4" style={{ color: '#023566' }}>
+                                {course.title}
+                            </h3>
+
+                            <div className="mb-4">
+                                <h5 className="text-[#F33869] font-bold text-[10px] uppercase tracking-widest mb-2 border-b border-gray-100 pb-1">
+                                    Descripción
+                                </h5>
+                                <p className="text-[#023566] text-sm leading-relaxed font-medium">
+                                    {course.description}
+                                </p>
+                            </div>
+
+                            <div className="w-12 h-1 bg-[#FFED00] mb-4" />
+
+                            <div>
+                                <h5 className="text-[#1F3FEA] font-bold text-[10px] uppercase tracking-widest mb-2 border-b border-gray-100 pb-1">
+                                    Dirigido a
+                                </h5>
+                                <p className="text-gray-600 text-sm italic flex items-start">
+                                    <span className="text-[#F33869] mr-2">▸</span>
+                                    {course.target}
+                                </p>
+                            </div>
+
+                            {/* Watermark logo */}
+                            <div className="mt-5 flex justify-end">
+                                <div className="relative w-16 h-16 opacity-30">
+                                    <Image
+                                        src={`/images/cursos/${course.logoName}`}
+                                        alt="Logo curso"
+                                        fill
+                                        sizes="64px"
+                                        loading="lazy"
+                                        className="object-contain"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </section>
+        </div>
     );
 }
