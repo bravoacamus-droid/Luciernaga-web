@@ -142,23 +142,27 @@ export default function ProyectosSection() {
     // Desktop (lg+) keeps the default 50% 50% (centered) — `max-lg:` prefix
     // ensures these only apply below the lg breakpoint (Android/iOS phones
     // and small tablets), so the desktop puzzle/grid layout is untouched.
+    //
+    // Direction notes (after user iteration): with these images + cover
+    // crop, LOWER % values shift the visible content TO THE RIGHT, and
+    // HIGHER % values shift it TO THE LEFT.
     const mobilePositionFor = (id: number): string => {
         const map: Record<number, string> = {
             // SET 1 — B&W (1-9)
-            // #2 (top row middle): mover a la derecha / centrar mas
-            2: "max-lg:[object-position:65%_50%]",
-            // #5 (center of grid, row 2 middle): mover a la derecha
-            5: "max-lg:[object-position:70%_50%]",
-            // #6 (row 2 right): mover a la derecha
-            6: "max-lg:[object-position:70%_50%]",
+            // #2 (fila 1 col 2): un poco a la derecha
+            2: "max-lg:[object-position:40%_50%]",
+            // #5 (fila 2 col 2): a la izquierda
+            5: "max-lg:[object-position:80%_50%]",
+            // #6 (fila 2 col 3): a la izquierda
+            6: "max-lg:[object-position:80%_50%]",
 
             // SET 2 — Color (10-18)
-            // #13 (row 2 first): mover a la izquierda
-            13: "max-lg:[object-position:30%_50%]",
-            // #15 (row 2 third): mover a la izquierda
-            15: "max-lg:[object-position:30%_50%]",
-            // #16 (row 3 first): un poquito mas a la derecha
-            16: "max-lg:[object-position:60%_50%]",
+            // #13 (fila 2 col 1): a la derecha
+            13: "max-lg:[object-position:25%_50%]",
+            // #15 (fila 2 col 3): ligeramente un poco mas a la izquierda
+            15: "max-lg:[object-position:65%_50%]",
+            // #16 (fila 3 col 1): a la izquierda
+            16: "max-lg:[object-position:70%_50%]",
         };
         return map[id] || "";
     };
