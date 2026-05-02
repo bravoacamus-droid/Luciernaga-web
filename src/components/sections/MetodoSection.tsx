@@ -168,19 +168,20 @@ export default function MetodoSection() {
     // Removed CTA logic - Moving to EquipoSection for cleaner transition
 
     return (
-        // CRITICAL: the wrapper needs to be 190vh on desktop so the sticky
-        // section's containing block extends full sticky duration. We use
-        // `lg:pb-[90vh]` (padding, not margin) on the wrapper because padding
-        // is part of the box height and is immune to margin-collapsing.
-        // On mobile the desktop section is display:none, so the wrapper is
-        // just the mobile section's natural height with no extra padding.
-        <div id="metodologia" className="lg:pb-[90vh]">
+        // `display: contents` makes this wrapper invisible to layout — its
+        // children (desktop + mobile sections) are positioned as if they
+        // were direct children of <main>, which is what the original code
+        // did. This preserves the sticky's ORIGINAL containing block (main)
+        // so `mb-[90vh]` on the section behaves exactly like before.
+        // The wrapper still exists in the DOM with id="metodologia" so
+        // anchor links (#metodologia) keep working.
+        <div id="metodologia" className="contents">
             {/* ============================================================
                 DESKTOP: original sticky accordion (untouched).
-                Note: `mb-[90vh]` removed from the section because the wrapper
-                now provides that space via padding-bottom (more reliable).
+                The mb-[90vh] is RESTORED on the section because we no longer
+                need padding on a wrapper (display:contents has no box).
                ============================================================ */}
-            <section ref={sectionRef} className="hidden lg:flex sticky top-0 z-0 h-screen overflow-hidden bg-[#023566] text-white flex-col">
+            <section ref={sectionRef} className="hidden lg:flex sticky top-0 z-0 h-screen mb-[90vh] overflow-hidden bg-[#023566] text-white flex-col">
 
                 {/* Header Intro */}
                 <div className="w-full px-4 md:px-8 lg:px-16 py-12 lg:pt-12 lg:pb-8 bg-[#023566] relative z-10">
