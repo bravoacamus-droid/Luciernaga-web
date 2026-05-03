@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence, Easing } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 
 const finalLogo = "/logo1.png";
 
@@ -114,91 +114,59 @@ export default function IntroLoader() {
     // CALCULO EXACTO DEL TARGET DEL LOGO HACIA EL NAVBAR
     // ====================================================================
     // Mide ambos logos (navbar e intro) y calcula el delta exacto para
-    // que el logo del intro aterrice pixel-perfect sobre la posicion del
-    // navbar logo.
+    // que el logo del intro aterrice pixel-perfect sobre la posicion
+    // del navbar logo.
     //
     // CRITICAL: hay que medir SOLO cuando el logo del intro esta en
-    // estado "center" (sin transform). Si medimos durante "enter"
-    // (rotateX -90 en desktop), getBoundingClientRect devuelve un rect
-    // distorsionado (altura ~0 por la rotacion 3D) y el calculo da Y
-    // negativos demas -- el logo termina volando muy arriba.
+    // estado "center" (sin transform). Si medimos durante "enter" o
+    // mid-animation, getBoundingClientRect devuelve un rect distorsionado.
     //
-    // Timeline:
-    //   step 2 (logo enters): ~3250ms desde mount
-    //   logo "center" anim:   1.5s en desktop, 0.8s en mobile
-    //   logo en posicion natural: ~4750ms (desktop) / ~4050ms (mobile)
-    //   step 4 (drop):        ~5450ms (logo se mueve y:80)
+    // Antes usabamos un timer hardcoded a 4800ms que se rompio cuando se
+    // extendieron los tiempos de lectura mobile (logo entra a 4450ms en
+    // vez de 3250ms; con anim de 0.8s recien esta en center a 5250ms).
     //
-    // Empezamos a medir a 4800ms (despues de center anim en ambos casos)
-    // y paramos antes de los 5400ms (antes del drop).
+    // Solucion: disparar la medicion via Framer Motion's onAnimationComplete
+    // cuando la animacion "center" del logo termina. Asi no depende de
+    // timing.
+    const measuredRef = useRef(false);
+    const measureFlyTarget = useCallback(() => {
+        if (measuredRef.current) return;
+        if (typeof window === "undefined") return;
+        const navLogo = document.querySelector<HTMLElement>('#main-navbar a img');
+        const introLogo = introLogoRef.current;
+        if (!navLogo || !introLogo) return;
+
+        const navRect = navLogo.getBoundingClientRect();
+        const introRect = introLogo.getBoundingClientRect();
+
+        // Validacion: rects deben tener dimensiones razonables.
+        if (navRect.width < 50 || navRect.height < 20) return;
+        if (introRect.width < 50 || introRect.height < 30) return;
+
+        const scale = navRect.width / introRect.width;
+        const navCenterX = navRect.left + navRect.width / 2;
+        const navCenterY = navRect.top + navRect.height / 2;
+        const introCenterX = introRect.left + introRect.width / 2;
+        const introCenterY = introRect.top + introRect.height / 2;
+
+        setFlyTarget({
+            x: navCenterX - introCenterX,
+            y: navCenterY - introCenterY,
+            scale,
+        });
+        measuredRef.current = true;
+    }, []);
+
+    // Recalcular en resize.
     useEffect(() => {
         if (typeof window === "undefined") return;
-
-        let measured = false;
-
-        const measure = (): boolean => {
-            if (measured) return true;
-            const navLogo = document.querySelector<HTMLElement>('#main-navbar a img');
-            const introLogo = introLogoRef.current;
-            if (!navLogo || !introLogo) return false;
-
-            const navRect = navLogo.getBoundingClientRect();
-            const introRect = introLogo.getBoundingClientRect();
-
-            // Validacion: rects deben tener dimensiones razonables. Si
-            // height es muy chica (< 30px) probablemente el logo esta en
-            // mid-animation con rotateX y getBoundingClientRect devuelve
-            // un rect distorsionado.
-            if (navRect.width < 50 || navRect.height < 20) return false;
-            if (introRect.width < 50 || introRect.height < 30) return false;
-
-            const scale = navRect.width / introRect.width;
-            const navCenterX = navRect.left + navRect.width / 2;
-            const navCenterY = navRect.top + navRect.height / 2;
-            const introCenterX = introRect.left + introRect.width / 2;
-            const introCenterY = introRect.top + introRect.height / 2;
-
-            setFlyTarget({
-                x: navCenterX - introCenterX,
-                y: navCenterY - introCenterY,
-                scale,
-            });
-            measured = true;
-            return true;
-        };
-
-        // Esperar hasta que la animacion "center" del logo termine (4.8s).
-        let pollInterval: ReturnType<typeof setInterval> | null = null;
-        const startTimer = setTimeout(() => {
-            // Intentar inmediatamente
-            if (measure()) return;
-            // Si no, polling cada 100ms hasta antes del drop (~5400ms)
-            pollInterval = setInterval(() => {
-                if (measure() && pollInterval) {
-                    clearInterval(pollInterval);
-                }
-            }, 100);
-        }, 4800);
-
-        // Stop polling antes del drop animation (a los ~5400ms)
-        const stopTimer = setTimeout(() => {
-            if (pollInterval) clearInterval(pollInterval);
-        }, 5400);
-
-        // Recalcular en resize (re-mide aunque ya este medido)
         const onResize = () => {
-            measured = false;
-            measure();
+            measuredRef.current = false;
+            measureFlyTarget();
         };
         window.addEventListener("resize", onResize);
-
-        return () => {
-            clearTimeout(startTimer);
-            clearTimeout(stopTimer);
-            if (pollInterval) clearInterval(pollInterval);
-            window.removeEventListener("resize", onResize);
-        };
-    }, []);
+        return () => window.removeEventListener("resize", onResize);
+    }, [measureFlyTarget]);
 
     // Fallback a los valores antiguos si la medicion aun no se completo.
     const fallbackY = windowHeight ? 46 - (windowHeight / 2) : -300;
@@ -306,6 +274,14 @@ export default function IntroLoader() {
                                     variants={logoVariants}
                                     initial="enter"
                                     animate={step >= 5 ? "fly" : step === 4 ? "drop" : "center"}
+                                    onAnimationComplete={(definition) => {
+                                        // Medir el target hacia el navbar SOLO cuando
+                                        // la animacion "center" termina (logo en
+                                        // posicion natural, sin transforms residuales).
+                                        if (definition === "center") {
+                                            measureFlyTarget();
+                                        }
+                                    }}
                                     className={`absolute z-20 flex justify-center items-center ${isMobile ? "" : "backface-hidden"}`}
                                 >
                                     <Image
