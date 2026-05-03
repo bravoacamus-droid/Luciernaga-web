@@ -44,8 +44,13 @@ export default function HeroSection() {
 
     // --- ANIMATION VALUES ---
 
-    // 1. TEXTO TRASERO
-    const textBackY = useTransform(scrollYProgress, [0, 0.7], ["38vh", "-50vh"]);
+    // 1. TEXTO TRASERO ("Deja de pensar / En pequeño")
+    // Mobile: arranca un poco mas arriba (30vh) que en desktop (38vh)
+    const textBackY = useTransform(
+        scrollYProgress,
+        [0, 0.7],
+        isMobile ? ["30vh", "-50vh"] : ["38vh", "-50vh"]
+    );
     const textBackOpacity = useTransform(scrollYProgress, [0, 0.15, 0.45], [1, 0.5, 0]);
     // Mobile: skip blur — heavy GPU filter causes jank on phones
     const textBackBlur = useTransform(
@@ -184,7 +189,7 @@ export default function HeroSection() {
                     className="absolute top-0 w-full text-center text-white uppercase tracking-[0.15em] z-30 pointer-events-none px-6 md:px-20"
                 >
                     <span
-                        className="block mt-[calc(78vh+5vw)] md:mt-[calc(56vh+15vw)] text-[clamp(0.75rem,2.5vw,0.95rem)] md:text-[1vw] font-medium leading-relaxed max-w-md md:max-w-none mx-auto"
+                        className="block mt-[calc(70vh+5vw)] md:mt-[calc(56vh+15vw)] text-[clamp(0.75rem,2.5vw,0.95rem)] md:text-[1vw] font-medium leading-relaxed max-w-md md:max-w-none mx-auto"
                     >
                         Diseñamos la arquitectura de influencia para el top 1% de líderes que exigen resultados medibles donde la comunicación convencional se detiene.
                     </span>

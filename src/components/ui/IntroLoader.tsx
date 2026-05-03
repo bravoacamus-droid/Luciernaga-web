@@ -146,15 +146,6 @@ export default function IntroLoader() {
             }
     ), [isMobile]);
 
-    // Tipografias mobile vs desktop
-    const word1Class = isMobile
-        ? "!text-2xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)]"
-        : "!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] backface-hidden";
-
-    const line2Class = isMobile
-        ? "!text-base !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-snug"
-        : "!text-xl md:!text-3xl !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-tight backface-hidden";
-
     return (
         <AnimatePresence>
             {show && (
@@ -164,10 +155,10 @@ export default function IntroLoader() {
                     exit={{ opacity: 0, pointerEvents: "none" }}
                     transition={{ duration: 0.8 }}
                 >
-                    <div className={`relative flex flex-col items-center justify-center w-full max-w-6xl px-4 ${isMobile ? "" : "perspective-[1000px]"}`}>
+                    <div className="relative flex flex-col items-center justify-center w-full max-w-6xl px-4 perspective-[1000px]">
 
                         {/* CONTENEDOR PRINCIPAL */}
-                        <div className={`h-20 md:h-24 w-full flex items-center justify-center relative mb-0 ${isMobile ? "" : "perspective-[1000px]"} overflow-visible`}>
+                        <div className={`h-20 md:h-24 w-full flex items-center justify-center relative mb-0 perspective-[1000px] ${step >= 4 ? 'overflow-visible' : 'overflow-visible'}`}>
 
                             {/* PALABRAS - LINEA 1 */}
                             <AnimatePresence mode="popLayout" initial={false}>
@@ -179,7 +170,7 @@ export default function IntroLoader() {
                                         animate="center"
                                         exit="exit"
                                         transition={FLIP_TRANSITION}
-                                        className={word1Class}
+                                        className="!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] backface-hidden"
                                     >
                                         {words[0]}
                                     </motion.h1>
@@ -192,7 +183,7 @@ export default function IntroLoader() {
                                         animate="center"
                                         exit="exit"
                                         transition={FLIP_TRANSITION}
-                                        className={word1Class}
+                                        className="!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] backface-hidden"
                                     >
                                         {words[1]}
                                     </motion.h1>
@@ -206,7 +197,7 @@ export default function IntroLoader() {
                                     variants={logoVariants}
                                     initial="enter"
                                     animate={step >= 5 ? "fly" : step === 4 ? "drop" : "center"}
-                                    className={`absolute z-20 flex justify-center items-center ${isMobile ? "" : "backface-hidden"}`}
+                                    className="absolute z-20 flex justify-center items-center backface-hidden"
                                 >
                                     <Image
                                         src={finalLogo}
@@ -215,7 +206,7 @@ export default function IntroLoader() {
                                         height={100}
                                         className="object-contain"
                                         priority
-                                        style={{ maxHeight: isMobile ? '70px' : '100px', width: 'auto' }}
+                                        style={{ maxHeight: '100px', width: 'auto' }}
                                     />
                                 </motion.div>
                             )}
@@ -229,24 +220,14 @@ export default function IntroLoader() {
                                         initial="hidden"
                                         animate={step >= 0 ? "visible" : "hidden"}
                                         exit="exit"
-                                        className={`absolute top-16 md:top-24 w-full flex justify-center items-center z-10 px-4 ${isMobile ? "" : "perspective-[1000px]"}`}
+                                        className="absolute top-16 md:top-24 w-full flex justify-center items-center z-10 perspective-[1000px]"
                                     >
-                                        <p className={line2Class}>
-                                            {/* prefix wrapped in inline-block min-width so the
-                                                whole sentence does not horizontally shift while
-                                                "Para" is deleted and "Construye" is typed letter
-                                                by letter — keeps text-center stable. */}
-                                            <span
-                                                className="inline-block text-left align-baseline"
-                                                style={{
-                                                    minWidth: isMobile ? '5.5em' : '6em',
-                                                    color: (prefix.startsWith("C") || prefix.startsWith("c")) ? "#FFED00" : "white",
-                                                }}
-                                            >
+                                        <p className="!text-xl md:!text-3xl !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-tight backface-hidden">
+                                            <span style={{ color: (prefix.startsWith("C") || prefix.startsWith("c")) ? "#FFED00" : "white" }}>
                                                 {prefix}
                                             </span>
                                             {baseText}
-                                            <span className={`inline-block w-[2px] ${isMobile ? "h-4" : "h-6 md:h-8"} bg-white animate-pulse ml-2 align-middle`}></span>
+                                            <span className="inline-block w-[2px] h-6 md:h-8 bg-white animate-pulse ml-2 align-middle"></span>
                                         </p>
                                     </motion.div>
                                 )}
