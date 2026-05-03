@@ -423,15 +423,18 @@ export default function CursosSection() {
                             </span>
                         </div>
 
-                        {/* Hero image — sized larger and given more breathing room */}
-                        <div className="relative w-full aspect-[4/3] bg-gray-50 overflow-hidden flex items-center justify-center px-3 pt-6 pb-8">
+                        {/* Hero image — sin aspect-ratio fija porque las
+                            imagenes son portrait (tablet mockups). Dejo
+                            que la imagen use su aspect natural a ancho
+                            completo, asi se ve mucho mas grande. */}
+                        <div className="relative w-full bg-gray-50 overflow-hidden flex items-center justify-center px-2 pt-6 pb-8">
                             <Image
                                 src={`/images/cursos/${course.imgName}`}
                                 alt={course.title}
                                 width={800}
-                                height={600}
+                                height={1000}
                                 loading="lazy"
-                                className="object-contain w-full h-full drop-shadow-2xl"
+                                className="w-full h-auto max-w-[460px] drop-shadow-2xl"
                             />
                         </div>
 

@@ -155,14 +155,15 @@ export default function ProyectosSection() {
             6: "max-lg:[object-position:20%_50%]",
 
             // SET 2 — Color (10-18)
-            // #13: abogado en ~55% (no centrado) — corregir para que quede en el medio
-            13: "max-lg:[object-position:60%_50%]",
-            // #15: con 50% solo se ve la camara en el centro. Mover a la
-            //      entrevistada (mujer detras del escritorio, ~70-75%)
-            15: "max-lg:[object-position:80%_50%]",
-            // #16: protagonista en la IZQUIERDA + fondo Pyme TV visible
-            //      a su derecha. Con ~40% la mujer queda en el borde
-            //      izquierdo de la celda y el logo Pyme entra a la derecha
+            // #13: abogado a ~62% del ancho (mas a la derecha de lo
+            //      estimado antes); 60% lo cortaba un poco al borde derecho
+            13: "max-lg:[object-position:68%_50%]",
+            // #15: el ENTREVISTADO (hombre) esta a la IZQUIERDA del
+            //      estudio (~20%), la entrevistadora al centro-derecha
+            15: "max-lg:[object-position:10%_50%]",
+            // #16: protagonista en la IZQUIERDA + fondo Pyme TV a la
+            //      derecha. 40% deja a la mujer en el borde izquierdo y
+            //      el logo Pyme entra por la derecha de la celda.
             16: "max-lg:[object-position:40%_50%]",
         };
         return map[id] || "";
