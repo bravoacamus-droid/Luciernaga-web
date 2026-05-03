@@ -32,11 +32,9 @@ export default function IntroLoader() {
 
     const CUSTOM_EASE: Easing = [0.16, 1, 0.3, 1];
 
-    // Desktop: 1.5s para el flip 3D (sensacion lenta y elegante).
-    // Mobile: 0.6s para sentir snappy (no hay flip 3D y los frames
-    // son mas pesados; 1.5s se siente lento y arrastrado).
+    // MÁS LENTO: 1.5s la rotación
     const FLIP_TRANSITION = {
-        duration: isMobile ? 0.6 : 1.5,
+        duration: 1.5,
         ease: CUSTOM_EASE
     };
 
@@ -111,66 +109,88 @@ export default function IntroLoader() {
     // ====================================================================
     // Mide ambos logos (navbar e intro) y calcula el delta exacto para
     // que el logo del intro aterrice pixel-perfect sobre la posicion del
-    // navbar logo. Mount-once para que el cleanup no cancele el timer
-    // cuando step cambia.
+    // navbar logo.
+    //
+    // CRITICAL: hay que medir SOLO cuando el logo del intro esta en
+    // estado "center" (sin transform). Si medimos durante "enter"
+    // (rotateX -90 en desktop), getBoundingClientRect devuelve un rect
+    // distorsionado (altura ~0 por la rotacion 3D) y el calculo da Y
+    // negativos demas -- el logo termina volando muy arriba.
+    //
+    // Timeline:
+    //   step 2 (logo enters): ~3250ms desde mount
+    //   logo "center" anim:   1.5s en desktop, 0.8s en mobile
+    //   logo en posicion natural: ~4750ms (desktop) / ~4050ms (mobile)
+    //   step 4 (drop):        ~5450ms (logo se mueve y:80)
+    //
+    // Empezamos a medir a 4800ms (despues de center anim en ambos casos)
+    // y paramos antes de los 5400ms (antes del drop).
     useEffect(() => {
         if (typeof window === "undefined") return;
 
-        const measure = () => {
-            // El navbar es renderizado en el mismo arbol; aunque su logo
-            // esta opacity:0 durante el intro, sigue ocupando layout, asi
-            // que getBoundingClientRect devuelve coordenadas validas.
+        let measured = false;
+
+        const measure = (): boolean => {
+            if (measured) return true;
             const navLogo = document.querySelector<HTMLElement>('#main-navbar a img');
             const introLogo = introLogoRef.current;
             if (!navLogo || !introLogo) return false;
 
             const navRect = navLogo.getBoundingClientRect();
             const introRect = introLogo.getBoundingClientRect();
-            // Si por alguna razon una de las dos no esta lista, abortar.
-            if (navRect.width === 0 || introRect.width === 0) return false;
 
-            // Escala: cuanto debe encoger el logo del intro para igualar
-            // al logo del navbar (mismo asset, distinta caja).
+            // Validacion: rects deben tener dimensiones razonables. Si
+            // height es muy chica (< 30px) probablemente el logo esta en
+            // mid-animation con rotateX y getBoundingClientRect devuelve
+            // un rect distorsionado.
+            if (navRect.width < 50 || navRect.height < 20) return false;
+            if (introRect.width < 50 || introRect.height < 30) return false;
+
             const scale = navRect.width / introRect.width;
-
-            // Centro de cada uno
             const navCenterX = navRect.left + navRect.width / 2;
             const navCenterY = navRect.top + navRect.height / 2;
             const introCenterX = introRect.left + introRect.width / 2;
             const introCenterY = introRect.top + introRect.height / 2;
 
-            // Delta para mover el centro del logo del intro al centro
-            // del logo del navbar. Como framer-motion translate ocurre
-            // ANTES del scale (con origen en el centro por defecto), el
-            // centro permanece en el target tras escalar.
             setFlyTarget({
                 x: navCenterX - introCenterX,
                 y: navCenterY - introCenterY,
                 scale,
             });
+            measured = true;
             return true;
         };
 
-        // El logo del intro aparece cuando step = 2 (~3.25s desde mount)
-        // y su animacion "center" tarda 0.8s en mobile / 1.5s en desktop.
-        // Hacemos polling cada 200ms hasta que la medicion sea exitosa
-        // (intro logo en DOM y con dimensiones validas).
-        const interval = setInterval(() => {
-            if (measure()) {
-                clearInterval(interval);
-            }
-        }, 200);
+        // Esperar hasta que la animacion "center" del logo termine (4.8s).
+        let pollInterval: ReturnType<typeof setInterval> | null = null;
+        const startTimer = setTimeout(() => {
+            // Intentar inmediatamente
+            if (measure()) return;
+            // Si no, polling cada 100ms hasta antes del drop (~5400ms)
+            pollInterval = setInterval(() => {
+                if (measure() && pollInterval) {
+                    clearInterval(pollInterval);
+                }
+            }, 100);
+        }, 4800);
 
-        // Stop polling despues de 8s para evitar leaks.
-        const stopTimer = setTimeout(() => clearInterval(interval), 8000);
+        // Stop polling antes del drop animation (a los ~5400ms)
+        const stopTimer = setTimeout(() => {
+            if (pollInterval) clearInterval(pollInterval);
+        }, 5400);
 
-        // Recalcular si la ventana cambia de tamano durante el intro.
-        window.addEventListener("resize", measure);
+        // Recalcular en resize (re-mide aunque ya este medido)
+        const onResize = () => {
+            measured = false;
+            measure();
+        };
+        window.addEventListener("resize", onResize);
 
         return () => {
-            clearInterval(interval);
+            clearTimeout(startTimer);
             clearTimeout(stopTimer);
-            window.removeEventListener("resize", measure);
+            if (pollInterval) clearInterval(pollInterval);
+            window.removeEventListener("resize", onResize);
         };
     }, []);
 
@@ -201,10 +221,10 @@ export default function IntroLoader() {
     const logoVariants = useMemo(() => (
         isMobile
             ? {
-                enter: { rotateX: 0, y: 30, opacity: 0, scale: 1, transition: { duration: 0.5, ease: CUSTOM_EASE } },
-                center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.5, ease: CUSTOM_EASE } },
-                drop: { rotateX: 0, y: 60, opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
-                fly: { rotateX: 0, y: targetY, x: targetX, opacity: 1, scale: targetScale, transition: { duration: 1.0, ease: "easeInOut" as Easing } },
+                enter: { rotateX: 0, y: 30, opacity: 0, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
+                center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
+                drop: { rotateX: 0, y: 60, opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeInOut" as Easing } },
+                fly: { rotateX: 0, y: targetY, x: targetX, opacity: 1, scale: targetScale, transition: { duration: 1.2, ease: "easeInOut" as Easing } },
             }
             : {
                 enter: { rotateX: -90, y: 20, opacity: 0, scale: 1, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: CUSTOM_EASE } },
@@ -219,8 +239,8 @@ export default function IntroLoader() {
         isMobile
             ? {
                 hidden: { rotateX: 0, opacity: 0, y: 20 },
-                visible: { rotateX: 0, opacity: 1, y: 0, transition: { duration: 0.5, ease: CUSTOM_EASE } },
-                exit: { rotateX: 0, y: 30, opacity: 0, transition: { duration: 0.4, ease: "easeInOut" as Easing } },
+                visible: { rotateX: 0, opacity: 1, y: 0, transition: { duration: 0.8, ease: CUSTOM_EASE } },
+                exit: { rotateX: 0, y: 30, opacity: 0, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
             }
             : {
                 hidden: { opacity: 0, y: 20 },
