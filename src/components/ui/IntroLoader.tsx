@@ -12,7 +12,15 @@ export default function IntroLoader() {
     const [prefix, setPrefix] = useState("Para");
     const baseText = " una marca que brilla diferente";
     const [windowHeight, setWindowHeight] = useState(0);
-    const [isMobile, setIsMobile] = useState(false);
+    // Lazy init: detectamos mobile en el primer render (no en useEffect)
+    // para que la primera animacion ya use las variants correctas. Si
+    // detectamos mobile en useEffect, el primer paint usa variants
+    // desktop (rotateX) y el texto queda atascado en rotateX -90 (invisible)
+    // porque framer-motion no las resetea cuando cambian las variants.
+    const [isMobile] = useState(() => {
+        if (typeof window === "undefined") return false;
+        return window.matchMedia("(max-width: 1023px)").matches;
+    });
 
     const words = ["Estrategia", "Impacto"];
 
@@ -27,10 +35,6 @@ export default function IntroLoader() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             setWindowHeight(window.innerHeight);
-            // Mobile: rotateX/perspective animations frame-drop on phones,
-            // making the intro look static or jumpy. Switch to lighter
-            // fade+slide variants below.
-            setIsMobile(window.matchMedia("(max-width: 1023px)").matches);
             document.body.style.overflow = "hidden";
         }
 
@@ -100,13 +104,14 @@ export default function IntroLoader() {
 
     // Mobile-aware variants: drop the heavy 3D rotateX/perspective combo
     // on phones (causes frame drops, animations look broken). On desktop
-    // we keep the original rotate-flip effect.
+    // we keep the original rotate-flip effect. Mobile variants explicitly
+    // set rotateX:0 to neutralize any sticky 3D state.
     const flipVariants = useMemo(() => (
         isMobile
             ? {
-                enter: { y: 30, opacity: 0 },
-                center: { y: 0, opacity: 1 },
-                exit: { y: -30, opacity: 0 },
+                enter: { rotateX: 0, y: 30, opacity: 0 },
+                center: { rotateX: 0, y: 0, opacity: 1 },
+                exit: { rotateX: 0, y: -30, opacity: 0 },
             }
             : {
                 enter: { rotateX: -90, y: 20, opacity: 0, transformOrigin: "50% 50% -20px" },
@@ -118,10 +123,10 @@ export default function IntroLoader() {
     const logoVariants = useMemo(() => (
         isMobile
             ? {
-                enter: { y: 30, opacity: 0, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                center: { y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                drop: { y: 60, opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeInOut" as Easing } },
-                fly: { y: targetY, x: 0, opacity: 1, scale: targetScale, transition: { duration: 1.2, ease: "easeInOut" as Easing } },
+                enter: { rotateX: 0, y: 30, opacity: 0, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
+                center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
+                drop: { rotateX: 0, y: 60, opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeInOut" as Easing } },
+                fly: { rotateX: 0, y: targetY, x: 0, opacity: 1, scale: targetScale, transition: { duration: 1.2, ease: "easeInOut" as Easing } },
             }
             : {
                 enter: { rotateX: -90, y: 20, opacity: 0, scale: 1, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: CUSTOM_EASE } },
@@ -135,9 +140,9 @@ export default function IntroLoader() {
     const line2Variants = useMemo(() => (
         isMobile
             ? {
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                exit: { y: 30, opacity: 0, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
+                hidden: { rotateX: 0, opacity: 0, y: 20 },
+                visible: { rotateX: 0, opacity: 1, y: 0, transition: { duration: 0.8, ease: CUSTOM_EASE } },
+                exit: { rotateX: 0, y: 30, opacity: 0, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
             }
             : {
                 hidden: { opacity: 0, y: 20 },
