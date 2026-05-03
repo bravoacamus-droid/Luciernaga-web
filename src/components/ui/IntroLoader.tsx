@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence, Easing } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 
 const finalLogo = "/logo1.png";
 
@@ -12,6 +12,12 @@ export default function IntroLoader() {
     const [prefix, setPrefix] = useState("Para");
     const baseText = " una marca que brilla diferente";
     const [windowHeight, setWindowHeight] = useState(0);
+    // Ref al wrapper del logo del intro -- usado para medir su rect
+    // y calcular el delta exacto hasta el logo del navbar.
+    const introLogoRef = useRef<HTMLDivElement>(null);
+    // Target dinamico para la variant "fly". Defaults a los valores
+    // anteriores hardcoded por si la medicion falla.
+    const [flyTarget, setFlyTarget] = useState<{ x: number; y: number; scale: number } | null>(null);
     // Lazy init: detectamos mobile en el primer render (no en useEffect)
     // para que la primera animacion ya use las variants correctas. Si
     // detectamos mobile en useEffect, el primer paint usa variants
@@ -98,9 +104,71 @@ export default function IntroLoader() {
         sequence();
     }, []);
 
-    // AJUSTE POSICIÓN FINAL: 46
-    const targetY = windowHeight ? 46 - (windowHeight / 2) : -300;
-    const targetScale = 0.40;
+    // ====================================================================
+    // CALCULO EXACTO DEL TARGET DEL LOGO HACIA EL NAVBAR
+    // ====================================================================
+    // Antes el logo volaba a constantes hardcoded (y = 46 - vh/2, scale 0.4)
+    // que no coincidian con la posicion real del logo del navbar (distinto
+    // tamano y aspect-ratio declarado entre uno y otro Image). Aca medimos
+    // ambos logos en runtime y calculamos el delta exacto.
+    //
+    // Cuando step = 2 el logo del intro ya esta montado y empezando su
+    // animacion de entrada (1.5s). Esperamos 1700ms para que termine y el
+    // logo este en su posicion natural (sin transform), luego medimos.
+    useEffect(() => {
+        if (step !== 2 || typeof window === "undefined") return;
+
+        const measure = () => {
+            // El navbar es renderizado en el mismo arbol; aunque su logo
+            // esta opacity:0 durante el intro, sigue ocupando layout, asi
+            // que getBoundingClientRect devuelve coordenadas validas.
+            const navLogo = document.querySelector<HTMLElement>('#main-navbar a img');
+            const introLogo = introLogoRef.current;
+            if (!navLogo || !introLogo) return;
+
+            const navRect = navLogo.getBoundingClientRect();
+            const introRect = introLogo.getBoundingClientRect();
+            // Si por alguna razon una de las dos no esta lista, abortar.
+            if (navRect.width === 0 || introRect.width === 0) return;
+
+            // Escala: cuanto debe encoger el logo del intro para igualar
+            // al logo del navbar (mismo asset, distinta caja).
+            const scale = navRect.width / introRect.width;
+
+            // Centro de cada uno
+            const navCenterX = navRect.left + navRect.width / 2;
+            const navCenterY = navRect.top + navRect.height / 2;
+            const introCenterX = introRect.left + introRect.width / 2;
+            const introCenterY = introRect.top + introRect.height / 2;
+
+            // Delta para mover el centro del logo del intro al centro
+            // del logo del navbar. Como framer-motion translate ocurre
+            // ANTES del scale (con origen en el centro por defecto), el
+            // centro permanece en el target tras escalar.
+            setFlyTarget({
+                x: navCenterX - introCenterX,
+                y: navCenterY - introCenterY,
+                scale,
+            });
+        };
+
+        // Esperar a que la animacion "center" del logo (1.5s) termine.
+        const timer = setTimeout(measure, 1700);
+
+        // Recalcular si la ventana cambia de tamano durante el intro.
+        window.addEventListener("resize", measure);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener("resize", measure);
+        };
+    }, [step]);
+
+    // Fallback a los valores antiguos si la medicion aun no se completo.
+    const fallbackY = windowHeight ? 46 - (windowHeight / 2) : -300;
+    const targetY = flyTarget?.y ?? fallbackY;
+    const targetX = flyTarget?.x ?? (isMobile ? 0 : 3);
+    const targetScale = flyTarget?.scale ?? 0.40;
 
     // Mobile-aware variants: drop the heavy 3D rotateX/perspective combo
     // on phones (causes frame drops, animations look broken). On desktop
@@ -126,15 +194,15 @@ export default function IntroLoader() {
                 enter: { rotateX: 0, y: 30, opacity: 0, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
                 center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
                 drop: { rotateX: 0, y: 60, opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeInOut" as Easing } },
-                fly: { rotateX: 0, y: targetY, x: 0, opacity: 1, scale: targetScale, transition: { duration: 1.2, ease: "easeInOut" as Easing } },
+                fly: { rotateX: 0, y: targetY, x: targetX, opacity: 1, scale: targetScale, transition: { duration: 1.2, ease: "easeInOut" as Easing } },
             }
             : {
                 enter: { rotateX: -90, y: 20, opacity: 0, scale: 1, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: CUSTOM_EASE } },
                 center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: CUSTOM_EASE } },
                 drop: { rotateX: 0, y: 80, opacity: 1, scale: 1, transformOrigin: "50% 50% -20px", transition: { duration: 1.0, ease: "easeInOut" as Easing } },
-                fly: { rotateX: 0, y: targetY, x: 3, opacity: 1, scale: targetScale, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: "easeInOut" as Easing } },
+                fly: { rotateX: 0, y: targetY, x: targetX, opacity: 1, scale: targetScale, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: "easeInOut" as Easing } },
             }
-    ), [targetY, targetScale, isMobile]);
+    ), [targetY, targetX, targetScale, isMobile]);
 
     // VARIANTS PARA LÍNEA 2
     const line2Variants = useMemo(() => (
@@ -199,6 +267,7 @@ export default function IntroLoader() {
                             {step >= 2 && (
                                 <motion.div
                                     key="logo-slot"
+                                    ref={introLogoRef}
                                     variants={logoVariants}
                                     initial="enter"
                                     animate={step >= 5 ? "fly" : step === 4 ? "drop" : "center"}
