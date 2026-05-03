@@ -262,10 +262,8 @@ export default function IntroLoader() {
                         {/* CONTENEDOR PRINCIPAL */}
                         <div className={`h-20 md:h-24 w-full flex items-center justify-center relative mb-0 overflow-visible ${isMobile ? "" : "perspective-[1000px]"}`}>
 
-                            {/* PALABRAS - LINEA 1 -- en mobile usamos mode "wait"
-                                para no superponer dos motion elements (cero costo
-                                de layout-pop). En desktop mantenemos popLayout. */}
-                            <AnimatePresence mode={isMobile ? "wait" : "popLayout"} initial={false}>
+                            {/* PALABRAS - LINEA 1 */}
+                            <AnimatePresence mode="popLayout" initial={false}>
                                 {step === 0 && (
                                     <motion.h1
                                         key="word1"
