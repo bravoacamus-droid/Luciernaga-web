@@ -32,9 +32,11 @@ export default function IntroLoader() {
 
     const CUSTOM_EASE: Easing = [0.16, 1, 0.3, 1];
 
-    // MÁS LENTO: 1.5s la rotación
+    // Desktop: 1.5s para el flip 3D (sensacion lenta y elegante).
+    // Mobile: 0.6s para sentir snappy (no hay flip 3D y los frames
+    // son mas pesados; 1.5s se siente lento y arrastrado).
     const FLIP_TRANSITION = {
-        duration: 1.5,
+        duration: isMobile ? 0.6 : 1.5,
         ease: CUSTOM_EASE
     };
 
@@ -107,16 +109,12 @@ export default function IntroLoader() {
     // ====================================================================
     // CALCULO EXACTO DEL TARGET DEL LOGO HACIA EL NAVBAR
     // ====================================================================
-    // Antes el logo volaba a constantes hardcoded (y = 46 - vh/2, scale 0.4)
-    // que no coincidian con la posicion real del logo del navbar (distinto
-    // tamano y aspect-ratio declarado entre uno y otro Image). Aca medimos
-    // ambos logos en runtime y calculamos el delta exacto.
-    //
-    // Cuando step = 2 el logo del intro ya esta montado y empezando su
-    // animacion de entrada (1.5s). Esperamos 1700ms para que termine y el
-    // logo este en su posicion natural (sin transform), luego medimos.
+    // Mide ambos logos (navbar e intro) y calcula el delta exacto para
+    // que el logo del intro aterrice pixel-perfect sobre la posicion del
+    // navbar logo. Mount-once para que el cleanup no cancele el timer
+    // cuando step cambia.
     useEffect(() => {
-        if (step !== 2 || typeof window === "undefined") return;
+        if (typeof window === "undefined") return;
 
         const measure = () => {
             // El navbar es renderizado en el mismo arbol; aunque su logo
@@ -124,12 +122,12 @@ export default function IntroLoader() {
             // que getBoundingClientRect devuelve coordenadas validas.
             const navLogo = document.querySelector<HTMLElement>('#main-navbar a img');
             const introLogo = introLogoRef.current;
-            if (!navLogo || !introLogo) return;
+            if (!navLogo || !introLogo) return false;
 
             const navRect = navLogo.getBoundingClientRect();
             const introRect = introLogo.getBoundingClientRect();
             // Si por alguna razon una de las dos no esta lista, abortar.
-            if (navRect.width === 0 || introRect.width === 0) return;
+            if (navRect.width === 0 || introRect.width === 0) return false;
 
             // Escala: cuanto debe encoger el logo del intro para igualar
             // al logo del navbar (mismo asset, distinta caja).
@@ -150,19 +148,31 @@ export default function IntroLoader() {
                 y: navCenterY - introCenterY,
                 scale,
             });
+            return true;
         };
 
-        // Esperar a que la animacion "center" del logo (1.5s) termine.
-        const timer = setTimeout(measure, 1700);
+        // El logo del intro aparece cuando step = 2 (~3.25s desde mount)
+        // y su animacion "center" tarda 0.8s en mobile / 1.5s en desktop.
+        // Hacemos polling cada 200ms hasta que la medicion sea exitosa
+        // (intro logo en DOM y con dimensiones validas).
+        const interval = setInterval(() => {
+            if (measure()) {
+                clearInterval(interval);
+            }
+        }, 200);
+
+        // Stop polling despues de 8s para evitar leaks.
+        const stopTimer = setTimeout(() => clearInterval(interval), 8000);
 
         // Recalcular si la ventana cambia de tamano durante el intro.
         window.addEventListener("resize", measure);
 
         return () => {
-            clearTimeout(timer);
+            clearInterval(interval);
+            clearTimeout(stopTimer);
             window.removeEventListener("resize", measure);
         };
-    }, [step]);
+    }, []);
 
     // Fallback a los valores antiguos si la medicion aun no se completo.
     const fallbackY = windowHeight ? 46 - (windowHeight / 2) : -300;
@@ -191,10 +201,10 @@ export default function IntroLoader() {
     const logoVariants = useMemo(() => (
         isMobile
             ? {
-                enter: { rotateX: 0, y: 30, opacity: 0, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                drop: { rotateX: 0, y: 60, opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeInOut" as Easing } },
-                fly: { rotateX: 0, y: targetY, x: targetX, opacity: 1, scale: targetScale, transition: { duration: 1.2, ease: "easeInOut" as Easing } },
+                enter: { rotateX: 0, y: 30, opacity: 0, scale: 1, transition: { duration: 0.5, ease: CUSTOM_EASE } },
+                center: { rotateX: 0, y: 0, opacity: 1, scale: 1, transition: { duration: 0.5, ease: CUSTOM_EASE } },
+                drop: { rotateX: 0, y: 60, opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
+                fly: { rotateX: 0, y: targetY, x: targetX, opacity: 1, scale: targetScale, transition: { duration: 1.0, ease: "easeInOut" as Easing } },
             }
             : {
                 enter: { rotateX: -90, y: 20, opacity: 0, scale: 1, transformOrigin: "50% 50% -20px", transition: { duration: 1.5, ease: CUSTOM_EASE } },
@@ -209,8 +219,8 @@ export default function IntroLoader() {
         isMobile
             ? {
                 hidden: { rotateX: 0, opacity: 0, y: 20 },
-                visible: { rotateX: 0, opacity: 1, y: 0, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                exit: { rotateX: 0, y: 30, opacity: 0, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
+                visible: { rotateX: 0, opacity: 1, y: 0, transition: { duration: 0.5, ease: CUSTOM_EASE } },
+                exit: { rotateX: 0, y: 30, opacity: 0, transition: { duration: 0.4, ease: "easeInOut" as Easing } },
             }
             : {
                 hidden: { opacity: 0, y: 20 },
@@ -296,12 +306,12 @@ export default function IntroLoader() {
                                         exit="exit"
                                         className="absolute top-16 md:top-24 w-full flex justify-center items-center z-10 perspective-[1000px]"
                                     >
-                                        <p className="!text-xl md:!text-3xl !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-tight backface-hidden">
+                                        <p className="!text-base sm:!text-xl md:!text-3xl !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-snug md:leading-tight backface-hidden">
                                             <span style={{ color: (prefix.startsWith("C") || prefix.startsWith("c")) ? "#FFED00" : "white" }}>
                                                 {prefix}
                                             </span>
                                             {baseText}
-                                            <span className="inline-block w-[2px] h-6 md:h-8 bg-white animate-pulse ml-2 align-middle"></span>
+                                            <span className="inline-block w-[2px] h-5 md:h-8 bg-white animate-pulse ml-2 align-middle"></span>
                                         </p>
                                     </motion.div>
                                 )}
