@@ -139,30 +139,28 @@ export default function ProyectosSection() {
     const set2 = projectImages.slice(9, 18);
 
     // Mobile-only object-position overrides per image id.
-    // Desktop (lg+) keeps the default 50% 50% (centered) — `max-lg:` prefix
-    // ensures these only apply below the lg breakpoint (Android/iOS phones
-    // and small tablets), so the desktop puzzle/grid layout is untouched.
+    // Desktop (lg+) keeps the default 50% 50% (centered).
     //
-    // Direction notes (after user iteration): with these images + cover
-    // crop, LOWER % values shift the visible content TO THE RIGHT, and
-    // HIGHER % values shift it TO THE LEFT.
+    // Each value was chosen by VISUALLY INSPECTING the original image and
+    // picking the % that places the protagonist roughly at the cell center
+    // when the image is cropped via object-cover into a tall mobile cell.
     const mobilePositionFor = (id: number): string => {
         const map: Record<number, string> = {
             // SET 1 — B&W (1-9)
-            // #2 (fila 1 col 2): un poco a la derecha
-            2: "max-lg:[object-position:40%_50%]",
-            // #5 (fila 2 col 2): a la izquierda
-            5: "max-lg:[object-position:80%_50%]",
-            // #6 (fila 2 col 3): a la izquierda
-            6: "max-lg:[object-position:80%_50%]",
+            // #2: hombre con producto Roll&Comb a ~30% del ancho — centrar
+            2: "max-lg:[object-position:22%_50%]",
+            // #5: mujer Confia (al frente) a ~30% — centrar
+            5: "max-lg:[object-position:22%_50%]",
+            // #6: candidato Ysidro a ~28% — centrar
+            6: "max-lg:[object-position:20%_50%]",
 
             // SET 2 — Color (10-18)
-            // #13 (fila 2 col 1): a la derecha
-            13: "max-lg:[object-position:25%_50%]",
-            // #15 (fila 2 col 3): ligeramente un poco mas a la izquierda
-            15: "max-lg:[object-position:65%_50%]",
-            // #16 (fila 3 col 1): a la izquierda
-            16: "max-lg:[object-position:70%_50%]",
+            // #13: hombre en escritorio bastante centrado (~50%) — default
+            13: "max-lg:[object-position:50%_50%]",
+            // #15: estudio con dos personas, escena centrada — default
+            15: "max-lg:[object-position:50%_50%]",
+            // #16: mujer Pyme TV a ~28% — centrar
+            16: "max-lg:[object-position:20%_50%]",
         };
         return map[id] || "";
     };

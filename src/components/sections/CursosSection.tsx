@@ -423,15 +423,15 @@ export default function CursosSection() {
                             </span>
                         </div>
 
-                        {/* Hero image */}
-                        <div className="relative w-full aspect-video bg-gray-50 overflow-hidden flex items-center justify-center px-8 pt-4 pb-6">
+                        {/* Hero image — sized larger and given more breathing room */}
+                        <div className="relative w-full aspect-[4/3] bg-gray-50 overflow-hidden flex items-center justify-center px-3 pt-6 pb-8">
                             <Image
                                 src={`/images/cursos/${course.imgName}`}
                                 alt={course.title}
-                                width={500}
-                                height={400}
+                                width={800}
+                                height={600}
                                 loading="lazy"
-                                className="object-contain max-h-full w-auto drop-shadow-xl"
+                                className="object-contain w-full h-full drop-shadow-2xl"
                             />
                         </div>
 
