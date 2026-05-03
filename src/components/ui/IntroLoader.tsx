@@ -234,20 +234,14 @@ export default function IntroLoader() {
             }
     ), [targetY, targetX, targetScale, isMobile]);
 
-    // VARIANTS PARA LÍNEA 2
-    const line2Variants = useMemo(() => (
-        isMobile
-            ? {
-                hidden: { rotateX: 0, opacity: 0, y: 20 },
-                visible: { rotateX: 0, opacity: 1, y: 0, transition: { duration: 0.8, ease: CUSTOM_EASE } },
-                exit: { rotateX: 0, y: 30, opacity: 0, transition: { duration: 0.6, ease: "easeInOut" as Easing } },
-            }
-            : {
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 1.5, ease: CUSTOM_EASE } },
-                exit: { rotateX: -90, y: 40, opacity: 0, transformOrigin: "50% 50% -20px", transition: { duration: 1.0, ease: "easeInOut" as Easing } },
-            }
-    ), [isMobile]);
+    // VARIANTS PARA LÍNEA 2 -- fade puro (sin desplazamiento) para
+    // sentirse suave. Misma logica en desktop y mobile: la linea solo
+    // aparece y desaparece, sin animaciones pesadas.
+    const line2Variants = useMemo(() => ({
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.6, ease: "easeOut" as Easing } },
+        exit: { opacity: 0, transition: { duration: 0.4, ease: "easeIn" as Easing } },
+    }), []);
 
     return (
         <AnimatePresence>
@@ -258,13 +252,20 @@ export default function IntroLoader() {
                     exit={{ opacity: 0, pointerEvents: "none" }}
                     transition={{ duration: 0.8 }}
                 >
-                    <div className="relative flex flex-col items-center justify-center w-full max-w-6xl px-4 perspective-[1000px]">
+                    {/* perspective y backface-hidden solo se aplican en desktop:
+                        son necesarios para el flip 3D real, pero en mobile (que
+                        no usa rotateX) son overhead puro -- fuerzan una capa de
+                        compositing GPU para toda la jerarquia hijo, lo que causa
+                        el LAG/jank reportado por el usuario en celular. */}
+                    <div className={`relative flex flex-col items-center justify-center w-full max-w-6xl px-4 ${isMobile ? "" : "perspective-[1000px]"}`}>
 
                         {/* CONTENEDOR PRINCIPAL */}
-                        <div className={`h-20 md:h-24 w-full flex items-center justify-center relative mb-0 perspective-[1000px] ${step >= 4 ? 'overflow-visible' : 'overflow-visible'}`}>
+                        <div className={`h-20 md:h-24 w-full flex items-center justify-center relative mb-0 overflow-visible ${isMobile ? "" : "perspective-[1000px]"}`}>
 
-                            {/* PALABRAS - LINEA 1 */}
-                            <AnimatePresence mode="popLayout" initial={false}>
+                            {/* PALABRAS - LINEA 1 -- en mobile usamos mode "wait"
+                                para no superponer dos motion elements (cero costo
+                                de layout-pop). En desktop mantenemos popLayout. */}
+                            <AnimatePresence mode={isMobile ? "wait" : "popLayout"} initial={false}>
                                 {step === 0 && (
                                     <motion.h1
                                         key="word1"
@@ -273,7 +274,7 @@ export default function IntroLoader() {
                                         animate="center"
                                         exit="exit"
                                         transition={FLIP_TRANSITION}
-                                        className="!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] backface-hidden"
+                                        className={`!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] ${isMobile ? "" : "backface-hidden"}`}
                                     >
                                         {words[0]}
                                     </motion.h1>
@@ -286,7 +287,7 @@ export default function IntroLoader() {
                                         animate="center"
                                         exit="exit"
                                         transition={FLIP_TRANSITION}
-                                        className="!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] backface-hidden"
+                                        className={`!text-3xl md:!text-5xl font-bold !text-white tracking-widest absolute uppercase font-[family-name:var(--font-heading)] ${isMobile ? "" : "backface-hidden"}`}
                                     >
                                         {words[1]}
                                     </motion.h1>
@@ -301,7 +302,7 @@ export default function IntroLoader() {
                                     variants={logoVariants}
                                     initial="enter"
                                     animate={step >= 5 ? "fly" : step === 4 ? "drop" : "center"}
-                                    className="absolute z-20 flex justify-center items-center backface-hidden"
+                                    className={`absolute z-20 flex justify-center items-center ${isMobile ? "" : "backface-hidden"}`}
                                 >
                                     <Image
                                         src={finalLogo}
@@ -315,7 +316,7 @@ export default function IntroLoader() {
                                 </motion.div>
                             )}
 
-                            {/* LINEA 2 - SINCRONIZADA CON VARIANTS */}
+                            {/* LINEA 2 - fade puro */}
                             <AnimatePresence>
                                 {step < 4 && (
                                     <motion.div
@@ -324,9 +325,9 @@ export default function IntroLoader() {
                                         initial="hidden"
                                         animate={step >= 0 ? "visible" : "hidden"}
                                         exit="exit"
-                                        className="absolute top-16 md:top-24 w-full flex justify-center items-center z-10 perspective-[1000px]"
+                                        className={`absolute top-16 md:top-24 w-full flex justify-center items-center z-10 ${isMobile ? "" : "perspective-[1000px]"}`}
                                     >
-                                        <p className="!text-base sm:!text-xl md:!text-3xl !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-snug md:leading-tight backface-hidden">
+                                        <p className={`!text-base sm:!text-xl md:!text-3xl !text-white font-normal tracking-wide text-center font-[family-name:var(--font-body)] drop-shadow-md leading-snug md:leading-tight ${isMobile ? "" : "backface-hidden"}`}>
                                             <span style={{ color: (prefix.startsWith("C") || prefix.startsWith("c")) ? "#FFED00" : "white" }}>
                                                 {prefix}
                                             </span>
