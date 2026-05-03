@@ -49,12 +49,18 @@ export default function IntroLoader() {
             await new Promise((r) => setTimeout(r, 50));
             setStep(0);
 
-            // Tiempo lectura palabra 1 (Estrategia) - 1.4s
-            await new Promise((r) => setTimeout(r, 1400));
+            // Tiempo lectura palabra 1 (Estrategia)
+            // Mobile: el cross-fade de 1.5s consume la mayor parte de la
+            // ventana de visibilidad. Damos un poco mas de tiempo.
+            await new Promise((r) => setTimeout(r, isMobile ? 1700 : 1400));
             setStep(1);
 
-            // Tiempo lectura palabra 2 (Impacto) - 1.8s
-            await new Promise((r) => setTimeout(r, 1800));
+            // Tiempo lectura palabra 2 (Impacto)
+            // Mobile: extendido para compensar el cross-fade simultaneo
+            // entre Estrategia (exit 1.5s) e Impacto (enter 1.5s). Con
+            // 1800ms Impacto solo queda ~300ms al 100% de visibilidad
+            // antes de empezar a salir; con 2700ms son ~1200ms.
+            await new Promise((r) => setTimeout(r, isMobile ? 2700 : 1800));
             setStep(2); // Logo ENTRA
 
             await new Promise((r) => setTimeout(r, 800));
